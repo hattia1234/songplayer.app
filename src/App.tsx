@@ -20,7 +20,7 @@ function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isLoadingTrack, setIsLoadingTrack] = useState(false);
 
-  const audioRef = useRef(null);
+  const audioRef = useRef<HTMLAudioElement>(null);
   const artistKeyRef = useRef(null);
 
   // Initialize
@@ -50,7 +50,7 @@ function App() {
     }
   }, []);
 
-  const loadArtistImage = async (data) => {
+  const loadArtistImage = async (data: any) => {
     try {
       const res = await fetch(`/.netlify/functions/image?track=${encodeURIComponent(data.artistBitmap)}`);
       const result = await res.json();
@@ -67,9 +67,9 @@ function App() {
       return;
     }
     const term = searchTerm.toLowerCase();
-    const results = [];
-    artistData.albums.forEach(album => {
-      album.tracks.forEach((track, trackIndex) => {
+    const results: any[] = [];
+    artistData.albums.forEach((album: any) => {
+      album.tracks.forEach((track: any, trackIndex: number) => {
         if (track.title.toLowerCase().includes(term)) {
           results.push({ ...track, albumName: album.name, globalIndex: trackIndex });
         }
@@ -78,11 +78,13 @@ function App() {
     setSearchResults(results);
   }, [searchTerm, artistData]);
 
-  const loadTrack = async (trackIndex, album = currentAlbum) => {
+  const loadTrack = async (trackIndex: number, album = currentAlbum) => {
     if (!album || !artistKeyRef.current) return;
 
     setIsLoadingTrack(true);
     setIsPlaying(false);
+    setProgress(0);
+    setCurrentTime(0);
 
     const track = album.tracks[trackIndex];
 
@@ -91,14 +93,14 @@ function App() {
         `/.netlify/functions/stream?artist=${artistKeyRef.current}&album=${album.folder}&track=${encodeURIComponent(track.filename)}`
       );
       const audioData = await audioRes.json();
-      setStreamUrl(audioData.url);
 
       const coverRes = await fetch(
         `/.netlify/functions/image?track=${encodeURIComponent(album.cover)}`
       );
       const coverData = await coverRes.json();
-      setCoverArt(coverData.coverArt || coverData.url);
 
+      setStreamUrl(audioData.url);
+      setCoverArt(coverData.coverArt || coverData.url);
       setCurrentTrackIndex(trackIndex);
       setCurrentAlbum(album);
     } catch (err) {
@@ -113,7 +115,6 @@ function App() {
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio || !streamUrl) return;
-
     audio.src = streamUrl;
     audio.load();
   }, [streamUrl]);
@@ -152,14 +153,18 @@ function App() {
     };
   }, []);
 
-  const togglePlay = () => {
+  const togglePlay = async () => {
     const audio = audioRef.current;
     if (!audio || !streamUrl) return;
 
-    if (isPlaying) {
-      audio.pause();
-    } else {
-      audio.play().catch(err => console.error("Play failed:", err));
+    try {
+      if (isPlaying) {
+        audio.pause();
+      } else {
+        await audio.play();
+      }
+    } catch (err) {
+      console.error("Play failed:", err);
     }
   };
 
@@ -175,14 +180,16 @@ function App() {
     loadTrack(prev, currentAlbum);
   };
 
-  const seek = (e) => {
+  const seek = (e: React.ChangeEvent<HTMLInputElement>) => {
     const audio = audioRef.current;
     if (audio && audio.duration) {
-      audio.currentTime = (e.target.value / 100) * audio.duration;
+      const newTime = (Number(e.target.value) / 100) * audio.duration;
+      audio.currentTime = newTime;
+      setProgress(Number(e.target.value));
     }
   };
 
-  const switchAlbum = (album) => {
+  const switchAlbum = (album: any) => {
     setCurrentAlbum(album);
     setSearchTerm("");
     setCurrentTrackIndex(0);
@@ -190,13 +197,13 @@ function App() {
     setSidebarOpen(false);
   };
 
-  const playSearchResult = (result) => {
-    const album = artistData.albums.find(a => a.name === result.albumName);
+  const playSearchResult = (result: any) => {
+    const album = artistData.albums.find((a: any) => a.name === result.albumName);
     if (album) loadTrack(result.globalIndex, album);
   };
 
-  const formatTime = (secs) => {
-    if (!secs) return "0:00";
+  const formatTime = (secs: number) => {
+    if (!secs || isNaN(secs)) return "0:00";
     const m = Math.floor(secs / 60);
     const s = Math.floor(secs % 60);
     return `${m}:${s < 10 ? '0' : ''}${s}`;
@@ -227,7 +234,7 @@ function App() {
         </div>
         <div className="mb-8">
           <div className="text-xs text-zinc-500 mb-2">ALBUMS</div>
-          {artistData.albums.map((alb, i) => (
+          {artistData.albums.map((alb: any, i: number) => (
             <Button
               key={i}
               variant={currentAlbum.name === alb.name ? "default" : "ghost"}
@@ -242,6 +249,7 @@ function App() {
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col h-full overflow-hidden">
+        {/* Search Bar */}
         <div className="p-4 lg:p-6 border-b border-zinc-800 bg-zinc-900">
           <div className="relative max-w-2xl">
             <Search className="absolute left-4 top-3.5 w-5 h-5 text-zinc-400" />
@@ -254,12 +262,26 @@ function App() {
             />
           </div>
         </div>
+
+        {/* Album / Search Results */}
         <div className="flex-1 overflow-auto p-4 lg:p-8">
           <h1 className="text-3xl lg:text-4xl font-bold mb-8">
-            {isSearching ? `Results for "${searchTerm}"` : currentAlbum.name}
+            {isSearching ? (
+              `Results for "${searchTerm}"`
+            ) : (
+              <>
+                {currentAlbum.name}
+                {currentAlbum.subtitle && (
+                  <span className="block text-2xl lg:text-3xl text-zinc-400 font-medium mt-1">
+                    {currentAlbum.subtitle}
+                  </span>
+                )}
+              </>
+            )}
           </h1>
+
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-            {(isSearching ? searchResults : currentAlbum.tracks).map((item, idx) => {
+            {(isSearching ? searchResults : currentAlbum.tracks).map((item: any, idx: number) => {
               const isCurrent = !isSearching && idx === currentTrackIndex;
               return (
                 <div
@@ -290,9 +312,10 @@ function App() {
         </div>
       </div>
 
-      {/* Bottom Player */}
+      {/* ==================== PLAYER BAR ==================== */}
       <div className="fixed bottom-0 left-0 right-0 bg-zinc-900 border-t border-zinc-700 p-3 lg:p-4 z-50">
         <div className="max-w-5xl mx-auto flex items-center gap-3 lg:gap-6">
+          {/* Left - Song Info */}
           <div className="flex items-center gap-3 flex-1 min-w-0">
             {coverArt && <img src={coverArt} alt="cover" className="w-12 h-12 lg:w-14 lg:h-14 object-cover rounded-lg" />}
             <div className="min-w-0">
@@ -301,6 +324,7 @@ function App() {
             </div>
           </div>
 
+          {/* Center - Controls + Progress */}
           <div className="flex flex-col items-center flex-1 max-w-md">
             <div className="flex items-center gap-4 lg:gap-6">
               <Button variant="ghost" size="icon" onClick={handlePrev}>
@@ -328,7 +352,7 @@ function App() {
                 max="100"
                 value={progress}
                 onChange={seek}
-                className="flex-1 accent-emerald-500"
+                className="flex-1 accent-emerald-500 cursor-pointer"
               />
               <span>{formatTime(duration)}</span>
             </div>
