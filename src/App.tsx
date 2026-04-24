@@ -2,7 +2,6 @@ import { useEffect, useState, useRef } from 'react';
 import { Play, Pause, SkipBack, SkipForward, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import getArtistData from '@/artists/selector';
-
 function App() {
   const [artistData, setArtistData] = useState(null);
   const [currentAlbum, setCurrentAlbum] = useState(null);
@@ -19,11 +18,9 @@ function App() {
   const [error, setError] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isLoadingTrack, setIsLoadingTrack] = useState(false);
-  const [isSeeking, setIsSeeking] = useState(false);        // ← NEW
-
+  const [isSeeking, setIsSeeking] = useState(false); // ← NEW
   const audioRef = useRef<HTMLAudioElement>(null);
   const artistKeyRef = useRef(null);
-
   // Initialize
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -33,7 +30,6 @@ function App() {
       return;
     }
     artistKeyRef.current = artistKey;
-
     try {
       const data = getArtistData(artistKey);
       setArtistData(data);
@@ -50,7 +46,6 @@ function App() {
       setError("Failed to load artist data");
     }
   }, []);
-
   const loadArtistImage = async (data: any) => {
     try {
       const res = await fetch(`/.netlify/functions/image?track=${encodeURIComponent(data.artistBitmap)}`);
@@ -60,7 +55,6 @@ function App() {
       console.error(err);
     }
   };
-
   // Global Search
   useEffect(() => {
     if (!artistData || !searchTerm.trim()) {
@@ -78,30 +72,24 @@ function App() {
     });
     setSearchResults(results);
   }, [searchTerm, artistData]);
-
   const loadTrack = async (trackIndex: number, album = currentAlbum) => {
     if (!album || !artistKeyRef.current) return;
-
     setIsLoadingTrack(true);
     setIsPlaying(false);
     setProgress(0);
     setCurrentTime(0);
     setDuration(0);
     setIsSeeking(false);
-
     const track = album.tracks[trackIndex];
-
     try {
       const audioRes = await fetch(
         `/.netlify/functions/stream?artist=${artistKeyRef.current}&album=${album.folder}&track=${encodeURIComponent(track.filename)}`
       );
       const audioData = await audioRes.json();
-
       const coverRes = await fetch(
         `/.netlify/functions/image?track=${encodeURIComponent(album.cover)}`
       );
       const coverData = await coverRes.json();
-
       setStreamUrl(audioData.url);
       setCoverArt(coverData.coverArt || coverData.url);
       setCurrentTrackIndex(trackIndex);
@@ -113,7 +101,6 @@ function App() {
       setIsLoadingTrack(false);
     }
   };
-
   // Update audio source
   useEffect(() => {
     const audio = audioRef.current;
@@ -121,39 +108,31 @@ function App() {
     audio.src = streamUrl;
     audio.load();
   }, [streamUrl]);
-
   // Audio event listeners
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
-
     const handlePlay = () => setIsPlaying(true);
     const handlePause = () => setIsPlaying(false);
-
     const handleTimeUpdate = () => {
-      if (isSeeking) return;                    // ← Important for fresh streams
-
+      if (isSeeking) return; // ← Important for fresh streams
       setCurrentTime(audio.currentTime);
       if (audio.duration && !isNaN(audio.duration)) {
         setProgress((audio.currentTime / audio.duration) * 100);
       }
     };
-
     const handleLoadedMetadata = () => {
       setDuration(audio.duration);
     };
-
     const handleEnded = () => {
       setIsPlaying(false);
       handleNext();
     };
-
     audio.addEventListener('play', handlePlay);
     audio.addEventListener('pause', handlePause);
     audio.addEventListener('timeupdate', handleTimeUpdate);
     audio.addEventListener('loadedmetadata', handleLoadedMetadata);
     audio.addEventListener('ended', handleEnded);
-
     return () => {
       audio.removeEventListener('play', handlePlay);
       audio.removeEventListener('pause', handlePause);
@@ -162,42 +141,40 @@ function App() {
       audio.removeEventListener('ended', handleEnded);
     };
   }, [isSeeking]);
-
   const togglePlay = async () => {
     const audio = audioRef.current;
     if (!audio || !streamUrl) return;
     try {
       if (isPlaying) {
         audio.pause();
+        setIsPlaying(false);
       } else {
         await audio.play();
+        setIsPlaying(true);
       }
     } catch (err) {
       console.error("Play failed:", err);
     }
   };
-
   const handleNext = () => {
     if (!currentAlbum) return;
     const next = (currentTrackIndex + 1) % currentAlbum.tracks.length;
     loadTrack(next, currentAlbum);
   };
-
   const handlePrev = () => {
     if (!currentAlbum) return;
     const prev = currentTrackIndex === 0 ? currentAlbum.tracks.length - 1 : currentTrackIndex - 1;
     loadTrack(prev, currentAlbum);
   };
-
   const seek = (e: React.InputEvent<HTMLInputElement>) => {
       const audio = audioRef.current;
       if (!audio) return;
-  
+ 
       const newProgress = Number(e.currentTarget.value);
-      
+     
       setProgress(newProgress);
       setIsSeeking(true);
-  
+ 
       if (audio.duration && !isNaN(audio.duration)) {
           audio.currentTime = (newProgress / 100) * audio.duration;
       }
@@ -209,22 +186,18 @@ function App() {
     loadTrack(0, album);
     setSidebarOpen(false);
   };
-
   const playSearchResult = (result: any) => {
     const album = artistData.albums.find((a: any) => a.name === result.albumName);
     if (album) loadTrack(result.globalIndex, album);
   };
-
   const formatTime = (secs: number) => {
     if (!secs || isNaN(secs)) return "0:00";
     const m = Math.floor(secs / 60);
     const s = Math.floor(secs % 60);
     return `${m}:${s < 10 ? '0' : ''}${s}`;
   };
-
   if (error) return <div className="min-h-screen bg-zinc-950 flex items-center justify-center text-red-400">Error: {error}</div>;
   if (!artistData || !currentAlbum) return <div className="min-h-screen bg-zinc-950 flex items-center justify-center">Loading...</div>;
-
   const currentTrack = currentAlbum.tracks[currentTrackIndex];
   const isSearching = searchTerm.trim().length > 0;
 
