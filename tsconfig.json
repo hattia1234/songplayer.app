@@ -15,7 +15,8 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    "baseUrl": ".",
+    
+    // Removed baseUrl (deprecated in TS 6+ / will break in TS 7)
     "paths": {
       "@/*": ["./src/*"]
     }
