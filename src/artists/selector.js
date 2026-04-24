@@ -1,11 +1,14 @@
 // src/artists/selector.js
 
 import AddictiveCurves from './AddictiveCurves.js';
+import Alice from './Alice.js';
 // Import other artists here when you create them
 // import TheWeeknd from './TheWeeknd.js';
 
 const artistSelector = {
   'AddictiveCurves': AddictiveCurves,
+  'Alice': Alice
+  
   // Add new artists here:
   // 'TheWeeknd': TheWeeknd,
 };
