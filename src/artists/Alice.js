@@ -6,7 +6,7 @@ const artistData = {
 
   albums: [
     {
-      name: "Vol II: Bounce the Curve",
+      name: "A.L.I.C.E UNWOUND Vol I: The Game Master",
       folder: "AliceUnwound",
       cover: "https://i.ibb.co/cSYTDmVJ/ALICE-UNWOUND-VOL1.jpg",
 
