@@ -193,7 +193,7 @@ function App() {
       const audio = audioRef.current;
       if (!audio) return;
   
-      const newProgress = Number(e.target.value);
+      const newProgress = Number(e.currentTarget.value);
       
       setProgress(newProgress);
       setIsSeeking(true);
