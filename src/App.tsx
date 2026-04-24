@@ -19,6 +19,7 @@ function App() {
   const [error, setError] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isLoadingTrack, setIsLoadingTrack] = useState(false);
+  const [isSeeking, setIsSeeking] = useState(false);        // ← NEW
 
   const audioRef = useRef<HTMLAudioElement>(null);
   const artistKeyRef = useRef(null);
@@ -85,6 +86,8 @@ function App() {
     setIsPlaying(false);
     setProgress(0);
     setCurrentTime(0);
+    setDuration(0);
+    setIsSeeking(false);
 
     const track = album.tracks[trackIndex];
 
@@ -111,7 +114,7 @@ function App() {
     }
   };
 
-  // Update audio source when streamUrl changes
+  // Update audio source
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio || !streamUrl) return;
@@ -126,13 +129,20 @@ function App() {
 
     const handlePlay = () => setIsPlaying(true);
     const handlePause = () => setIsPlaying(false);
+
     const handleTimeUpdate = () => {
+      if (isSeeking) return;                    // ← Important for fresh streams
+
       setCurrentTime(audio.currentTime);
-      if (audio.duration) {
+      if (audio.duration && !isNaN(audio.duration)) {
         setProgress((audio.currentTime / audio.duration) * 100);
       }
     };
-    const handleLoadedMetadata = () => setDuration(audio.duration);
+
+    const handleLoadedMetadata = () => {
+      setDuration(audio.duration);
+    };
+
     const handleEnded = () => {
       setIsPlaying(false);
       handleNext();
@@ -151,12 +161,11 @@ function App() {
       audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
       audio.removeEventListener('ended', handleEnded);
     };
-  }, []);
+  }, [isSeeking]);
 
   const togglePlay = async () => {
     const audio = audioRef.current;
     if (!audio || !streamUrl) return;
-
     try {
       if (isPlaying) {
         audio.pause();
@@ -182,10 +191,14 @@ function App() {
 
   const seek = (e: React.ChangeEvent<HTMLInputElement>) => {
     const audio = audioRef.current;
-    if (audio && audio.duration) {
-      const newTime = (Number(e.target.value) / 100) * audio.duration;
-      audio.currentTime = newTime;
-      setProgress(Number(e.target.value));
+    if (!audio) return;
+
+    const newProgress = Number(e.target.value);
+    setProgress(newProgress);
+    setIsSeeking(true);
+
+    if (audio.duration && !isNaN(audio.duration)) {
+      audio.currentTime = (newProgress / 100) * audio.duration;
     }
   };
 
@@ -217,7 +230,7 @@ function App() {
 
   return (
     <div className="flex h-screen bg-zinc-950 text-white overflow-hidden">
-      {/* Sidebar */}
+      {/* Sidebar - unchanged */}
       <div className={`${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 fixed lg:relative z-50 w-72 bg-black h-full transition-transform duration-300 overflow-auto p-6 flex flex-col`}>
         {artistImage && (
           <div className="mb-6">
@@ -247,9 +260,8 @@ function App() {
         </div>
       </div>
 
-      {/* Main Content */}
+      {/* Main Content - unchanged */}
       <div className="flex-1 flex flex-col h-full overflow-hidden">
-        {/* Search Bar */}
         <div className="p-4 lg:p-6 border-b border-zinc-800 bg-zinc-900">
           <div className="relative max-w-2xl">
             <Search className="absolute left-4 top-3.5 w-5 h-5 text-zinc-400" />
@@ -263,7 +275,6 @@ function App() {
           </div>
         </div>
 
-        {/* Album / Search Results */}
         <div className="flex-1 overflow-auto p-4 lg:p-8">
           <h1 className="text-3xl lg:text-4xl font-bold mb-8">
             {isSearching ? (
@@ -312,10 +323,9 @@ function App() {
         </div>
       </div>
 
-      {/* ==================== PLAYER BAR ==================== */}
+      {/* ==================== FIXED PLAYER BAR ==================== */}
       <div className="fixed bottom-0 left-0 right-0 bg-zinc-900 border-t border-zinc-700 p-3 lg:p-4 z-50">
         <div className="max-w-5xl mx-auto flex items-center gap-3 lg:gap-6">
-          {/* Left - Song Info */}
           <div className="flex items-center gap-3 flex-1 min-w-0">
             {coverArt && <img src={coverArt} alt="cover" className="w-12 h-12 lg:w-14 lg:h-14 object-cover rounded-lg" />}
             <div className="min-w-0">
@@ -324,7 +334,6 @@ function App() {
             </div>
           </div>
 
-          {/* Center - Controls + Progress */}
           <div className="flex flex-col items-center flex-1 max-w-md">
             <div className="flex items-center gap-4 lg:gap-6">
               <Button variant="ghost" size="icon" onClick={handlePrev}>
@@ -352,6 +361,11 @@ function App() {
                 max="100"
                 value={progress}
                 onChange={seek}
+                onInput={seek}
+                onMouseUp={() => setIsSeeking(false)}
+                onTouchEnd={() => setIsSeeking(false)}
+                onPointerUp={() => setIsSeeking(false)}
+                step="0.1"
                 className="flex-1 accent-emerald-500 cursor-pointer"
               />
               <span>{formatTime(duration)}</span>
