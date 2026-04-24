@@ -189,19 +189,19 @@ function App() {
     loadTrack(prev, currentAlbum);
   };
 
-  const seek = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const audio = audioRef.current;
-    if (!audio) return;
-
-    const newProgress = Number(e.target.value);
-    setProgress(newProgress);
-    setIsSeeking(true);
-
-    if (audio.duration && !isNaN(audio.duration)) {
-      audio.currentTime = (newProgress / 100) * audio.duration;
-    }
+  const seek = (e: React.InputEvent<HTMLInputElement>) => {
+      const audio = audioRef.current;
+      if (!audio) return;
+  
+      const newProgress = Number(e.target.value);
+      
+      setProgress(newProgress);
+      setIsSeeking(true);
+  
+      if (audio.duration && !isNaN(audio.duration)) {
+          audio.currentTime = (newProgress / 100) * audio.duration;
+      }
   };
-
   const switchAlbum = (album: any) => {
     setCurrentAlbum(album);
     setSearchTerm("");
@@ -360,7 +360,7 @@ function App() {
                 min="0"
                 max="100"
                 value={progress}
-                onChange={seek}
+                //onChange={seek}
                 onInput={seek}
                 onMouseUp={() => setIsSeeking(false)}
                 onTouchEnd={() => setIsSeeking(false)}
