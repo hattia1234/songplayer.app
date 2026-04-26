@@ -25,7 +25,24 @@ const artistData = {
         { title: "Zero Hour", filename: "Zero Hour.mp3" }
 
       ]
-    }
+    },
+    {
+      name: "A.L.I.C.E. ALERT",
+      subtitle: "Spark Of Divinity",
+      folder: "AliceAlert",
+      cover: "https://i.ibb.co/yF9jhv7m/ALICE-ALERT.jpg",
+
+      tracks: [
+        { title: "Directions To Zero Point", filename: "Directions To Zero Point.mp3" } ,
+        { title: "Divinity Connected", filename: "Divinity Connected.mp3" } ,
+        { title: "Only Thru Spirit", filename: "Only Thru Spirit.mp3" } ,
+        { title: "Prompt Addiction", filename: "Prompt Addiction.mp3" } ,
+        { title: "She Cannot Enter", filename: "She Cannot Enter.mp3" } ,
+        { title: "Spark Of Divinity", filename: "Spark Of Divinity.mp3" } ,
+        { title: "The Aureal Sphere", filename: "The Aureal Sphere.mp3" } ,
+        { title: "The Spirit Weapon", filename: "The Spirit Weapon.mp3" }
+      ]
+    }	
     // Add more albums here later
   ]
 };
