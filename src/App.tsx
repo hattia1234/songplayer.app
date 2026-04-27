@@ -105,14 +105,10 @@ function App() {
         const track = album.tracks[trackIndex];
 
         try {
-            const audioRes = await fetch(
-                `/.netlify/functions/stream?artist=${artistKeyRef.current}&album=${album.folder}&track=${encodeURIComponent(track.filename)}`
-            );
+            const audioRes = await fetch(`/.netlify/functions/stream?artist=${artistKeyRef.current}&album=${album.folder}&track=${encodeURIComponent(track.filename)}`);
             const audioData = await audioRes.json();
 
-            const coverRes = await fetch(
-                `/.netlify/functions/image?track=${encodeURIComponent(album.cover)}`
-            );
+            const coverRes = await fetch(`/.netlify/functions/image?track=${encodeURIComponent(album.cover)}`);
             const coverData = await coverRes.json();
 
             setStreamUrl(audioData.url);
@@ -214,7 +210,9 @@ function App() {
         return `${m}:${s < 10 ? '0' : ''}${s}`;
     };
 
-    const togglePlayerExpand = () => setIsPlayerExpanded(!isPlayerExpanded);
+    const togglePlayerExpand = () => setIsPlayerExpanded(prev => !prev);
+
+    const closeSidebar = () => setSidebarOpen(false);
 
     if (error) return <div className="min-h-screen bg-zinc-950 flex items-center justify-center text-red-400">Error: {error}</div>;
     if (!artistData || !currentAlbum) return <div className="min-h-screen bg-zinc-950 flex items-center justify-center">Loading...</div>;
@@ -223,8 +221,8 @@ function App() {
     const isSearching = searchTerm.trim().length > 0;
 
     return (
-        <div className="flex h-screen bg-zinc-950 text-white overflow-hidden">
-            {/* Sidebar */}
+        <div className="flex h-screen bg-zinc-950 text-white overflow-hidden relative">
+            {/* SIDEBAR */}
             <div className={`${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 fixed lg:relative z-50 
                 w-80 sm:w-72 lg:w-80 bg-zinc-950 h-full transition-transform duration-300 overflow-auto 
                 p-4 lg:p-6 flex flex-col border-r border-zinc-800`}>
@@ -234,7 +232,7 @@ function App() {
                         <div className="w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center text-xl">♪</div>
                         <span className="text-xl font-bold">Songplayer</span>
                     </div>
-                    <Button variant="ghost" size="icon" onClick={() => setSidebarOpen(false)}>✕</Button>
+                    <Button variant="ghost" size="icon" onClick={closeSidebar}>✕</Button>
                 </div>
 
                 {artistImage && (
@@ -263,7 +261,12 @@ function App() {
                 </div>
             </div>
 
-            {/* Main Content */}
+            {/* Overlay for mobile sidebar */}
+            {sidebarOpen && (
+                <div className="fixed inset-0 bg-black/60 z-40 lg:hidden" onClick={closeSidebar} />
+            )}
+
+            {/* MAIN CONTENT */}
             <div className="flex-1 flex flex-col h-full overflow-hidden">
                 <div className="p-4 lg:p-6 border-b border-zinc-800 bg-zinc-900 flex items-center gap-4">
                     <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setSidebarOpen(true)}>
@@ -326,9 +329,9 @@ function App() {
                 </div>
             </div>
 
-            {/* MINI PLAYER */}
+            {/* MINI PLAYER - Click to Expand */}
             <div
-                className="fixed bottom-0 left-0 right-0 bg-zinc-900 border-t border-zinc-700 p-3 lg:p-4 z-50 cursor-pointer hover:bg-zinc-800 transition-colors"
+                className="fixed bottom-0 left-0 right-0 bg-zinc-900 border-t border-zinc-700 p-3 lg:p-4 z-50 cursor-pointer active:bg-zinc-800 transition-colors"
                 onClick={togglePlayerExpand}
             >
                 <div className="max-w-5xl mx-auto flex items-center gap-3 lg:gap-6">
@@ -344,21 +347,12 @@ function App() {
                         <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); handlePrev(); }}>
                             <SkipBack className="w-5 h-5" />
                         </Button>
-
-                        <Button
-                            onClick={(e) => { e.stopPropagation(); togglePlay(); }}
-                            disabled={isLoadingTrack || !streamUrl}
-                            className="w-11 h-11 lg:w-14 lg:h-14 rounded-full bg-white text-black hover:bg-white/90 disabled:opacity-50"
-                        >
-                            {isLoadingTrack ? (
-                                <div className="w-5 h-5 border-2 border-zinc-400 border-t-white animate-spin rounded-full" />
-                            ) : isPlaying ? (
-                                <Pause className="w-5 h-5 lg:w-6 lg:h-6" />
-                            ) : (
-                                <Play className="w-5 h-5 lg:w-6 lg:h-6" />
-                            )}
+                        <Button onClick={(e) => { e.stopPropagation(); togglePlay(); }} disabled={isLoadingTrack || !streamUrl}
+                            className="w-11 h-11 lg:w-14 lg:h-14 rounded-full bg-white text-black hover:bg-white/90 disabled:opacity-50">
+                            {isLoadingTrack ? <div className="w-5 h-5 border-2 border-zinc-400 border-t-white animate-spin rounded-full" /> 
+                                : isPlaying ? <Pause className="w-5 h-5 lg:w-6 lg:h-6" /> 
+                                : <Play className="w-5 h-5 lg:w-6 lg:h-6" />}
                         </Button>
-
                         <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); handleNext(); }}>
                             <SkipForward className="w-5 h-5" />
                         </Button>
@@ -368,9 +362,9 @@ function App() {
 
             {/* EXPANDED PLAYER */}
             {isPlayerExpanded && (
-                <div className="fixed inset-0 bg-zinc-950 z-[60] flex flex-col">
+                <div className="fixed inset-0 bg-zinc-950 z-[70] flex flex-col">
                     <div className="p-4 flex justify-end">
-                        <Button variant="ghost" size="icon" onClick={togglePlayerExpand}>
+                        <Button variant="ghost" size="icon" onClick={() => setIsPlayerExpanded(false)}>
                             <X className="w-7 h-7" />
                         </Button>
                     </div>
@@ -394,10 +388,8 @@ function App() {
                             </div>
                             <input
                                 type="range"
-                                min="0"
-                                max="100"
-                                value={progress}
-                                onChange={seek}           {/* ← Fixed here */}
+                                min="0" max="100" value={progress}
+                                onChange={seek}
                                 onMouseUp={handleSeekEnd}
                                 onTouchEnd={handleSeekEnd}
                                 onPointerUp={handleSeekEnd}
@@ -410,11 +402,8 @@ function App() {
                             <Button variant="ghost" size="icon" onClick={handlePrev}>
                                 <SkipBack className="w-9 h-9" />
                             </Button>
-                            <Button
-                                onClick={togglePlay}
-                                disabled={isLoadingTrack || !streamUrl}
-                                className="w-24 h-24 rounded-full bg-white text-black hover:bg-white/90 disabled:opacity-50"
-                            >
+                            <Button onClick={togglePlay} disabled={isLoadingTrack || !streamUrl}
+                                className="w-24 h-24 rounded-full bg-white text-black hover:bg-white/90 disabled:opacity-50">
                                 {isPlaying ? <Pause className="w-12 h-12" /> : <Play className="w-12 h-12 ml-1" />}
                             </Button>
                             <Button variant="ghost" size="icon" onClick={handleNext}>
