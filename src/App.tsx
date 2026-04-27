@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
-import { Play, Pause, SkipBack, SkipForward, Search, X } from 'lucide-react';
+import { Play, Pause, SkipBack, SkipForward, Search, X, Shuffle, Repeat, Repeat1 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import getArtistData from '@/artists/selector';
 
@@ -22,8 +22,12 @@ function App() {
     const [isSeeking, setIsSeeking] = useState(false);
     const [isPlayerExpanded, setIsPlayerExpanded] = useState(false);
 
+    const [playbackMode, setPlaybackMode] = useState<'sequential' | 'shuffle' | 'repeat-one' | 'repeat-all'>('sequential');
+    const [shuffledOrder, setShuffledOrder] = useState<number[]>([]);
+
     const audioRef = useRef<HTMLAudioElement>(null);
     const artistKeyRef = useRef(null);
+    const shouldAutoPlayRef = useRef(true);
 
     // Initialize
     useEffect(() => {
@@ -80,23 +84,24 @@ function App() {
         setSearchResults(results);
     }, [searchTerm, artistData]);
 
-    const handleNext = useCallback(() => {
+    const generateShuffledOrder = useCallback(() => {
         if (!currentAlbum) return;
-        const next = (currentTrackIndex + 1) % currentAlbum.tracks.length;
-        loadTrack(next, currentAlbum);
-    }, [currentAlbum, currentTrackIndex]);
+        const order = Array.from({ length: currentAlbum.tracks.length }, (_, i) => i);
+        for (let i = order.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [order[i], order[j]] = [order[j], order[i]];
+        }
+        setShuffledOrder(order);
+    }, [currentAlbum]);
 
-    const handlePrev = () => {
-        if (!currentAlbum) return;
-        const prev = currentTrackIndex === 0 ? currentAlbum.tracks.length - 1 : currentTrackIndex - 1;
-        loadTrack(prev, currentAlbum);
-    };
+    useEffect(() => {
+        if (playbackMode === 'shuffle' && currentAlbum) generateShuffledOrder();
+    }, [playbackMode, currentAlbum, generateShuffledOrder]);
 
     const loadTrack = async (trackIndex: number, album = currentAlbum) => {
         if (!album || !artistKeyRef.current) return;
 
         setIsLoadingTrack(true);
-        setIsPlaying(false);
         setProgress(0);
         setCurrentTime(0);
         setDuration(0);
@@ -105,7 +110,9 @@ function App() {
         const track = album.tracks[trackIndex];
 
         try {
-            const audioRes = await fetch(`/.netlify/functions/stream?artist=${artistKeyRef.current}&album=${album.folder}&track=${encodeURIComponent(track.filename)}`);
+            const audioRes = await fetch(
+                `/.netlify/functions/stream?artist=${artistKeyRef.current}&album=${album.folder}&track=${encodeURIComponent(track.filename)}`
+            );
             const audioData = await audioRes.json();
 
             const coverRes = await fetch(`/.netlify/functions/image?track=${encodeURIComponent(album.cover)}`);
@@ -123,13 +130,61 @@ function App() {
         }
     };
 
+    // Auto play after new track loads
     useEffect(() => {
         const audio = audioRef.current;
         if (!audio || !streamUrl) return;
+
         audio.src = streamUrl;
         audio.load();
+
+        const timer = setTimeout(() => {
+            if (shouldAutoPlayRef.current) {
+                audio.play().catch(console.error);
+            }
+        }, 600);
+
+        return () => clearTimeout(timer);
     }, [streamUrl]);
 
+    const handleNext = useCallback(() => {
+        if (!currentAlbum) return;
+
+        let nextIndex = currentTrackIndex;
+
+        if (playbackMode === 'shuffle' && shuffledOrder.length > 0) {
+            const currentPos = shuffledOrder.indexOf(currentTrackIndex);
+            nextIndex = currentPos < shuffledOrder.length - 1 
+                ? shuffledOrder[currentPos + 1] 
+                : shuffledOrder[0];
+        } else {
+            nextIndex = (currentTrackIndex + 1) % currentAlbum.tracks.length;
+        }
+
+        loadTrack(nextIndex, currentAlbum);
+    }, [currentAlbum, currentTrackIndex, playbackMode, shuffledOrder]);
+
+    const handlePrev = () => {
+        if (!currentAlbum) return;
+        const prev = currentTrackIndex === 0 ? currentAlbum.tracks.length - 1 : currentTrackIndex - 1;
+        loadTrack(prev, currentAlbum);
+    };
+
+    const togglePlay = async () => {
+        const audio = audioRef.current;
+        if (!audio || !streamUrl) return;
+        try {
+            if (isPlaying) {
+                audio.pause();
+            } else {
+                await audio.play();
+            }
+        } catch (err) {
+            console.error("Play failed:", err);
+        }
+    };
+
+    // Audio listeners
     useEffect(() => {
         const audio = audioRef.current;
         if (!audio) return;
@@ -144,8 +199,16 @@ function App() {
             }
         };
         const handleLoadedMetadata = () => setDuration(audio.duration);
+
         const handleEnded = () => {
             setIsPlaying(false);
+
+            if (playbackMode === 'repeat-one') {
+                audio.currentTime = 0;
+                audio.play().catch(console.error);
+                return;
+            }
+
             handleNext();
         };
 
@@ -162,18 +225,7 @@ function App() {
             audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
             audio.removeEventListener('ended', handleEnded);
         };
-    }, [isSeeking, handleNext]);
-
-    const togglePlay = async () => {
-        const audio = audioRef.current;
-        if (!audio || !streamUrl) return;
-        try {
-            if (isPlaying) audio.pause();
-            else await audio.play();
-        } catch (err) {
-            console.error("Play failed:", err);
-        }
-    };
+    }, [isSeeking, handleNext, playbackMode]);
 
     const seek = (e: React.ChangeEvent<HTMLInputElement>) => {
         const audio = audioRef.current;
@@ -211,8 +263,11 @@ function App() {
     };
 
     const togglePlayerExpand = () => setIsPlayerExpanded(prev => !prev);
-
     const closeSidebar = () => setSidebarOpen(false);
+
+    const toggleMode = (mode: 'sequential' | 'shuffle' | 'repeat-one' | 'repeat-all') => {
+        setPlaybackMode(prev => (prev === mode ? 'sequential' : mode));
+    };
 
     if (error) return <div className="min-h-screen bg-zinc-950 flex items-center justify-center text-red-400">Error: {error}</div>;
     if (!artistData || !currentAlbum) return <div className="min-h-screen bg-zinc-950 flex items-center justify-center">Loading...</div>;
@@ -222,7 +277,7 @@ function App() {
 
     return (
         <div className="flex h-screen bg-zinc-950 text-white overflow-hidden relative">
-            {/* Sidebar + Overlay */}
+            {/* SIDEBAR */}
             <div className={`${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 fixed lg:relative z-50 w-80 sm:w-72 lg:w-80 bg-zinc-950 h-full transition-transform duration-300 overflow-auto p-4 lg:p-6 flex flex-col border-r border-zinc-800`}>
                 <div className="flex items-center justify-between lg:hidden mb-6 sticky top-0 bg-zinc-950 pb-4 z-10">
                     <div className="flex items-center gap-3">
@@ -246,8 +301,12 @@ function App() {
                 <div className="flex-1 overflow-auto pb-32">
                     <div className="text-xs text-zinc-500 mb-3 sticky top-0 bg-zinc-950 py-2 z-10">ALBUMS</div>
                     {artistData.albums.map((alb: any, i: number) => (
-                        <Button key={i} variant={currentAlbum.name === alb.name ? "default" : "ghost"}
-                            className="justify-start w-full text-left mb-1.5 py-3 text-base" onClick={() => switchAlbum(alb)}>
+                        <Button
+                            key={i}
+                            variant={currentAlbum.name === alb.name ? "default" : "ghost"}
+                            className="justify-start w-full text-left mb-1.5 py-3 text-base"
+                            onClick={() => switchAlbum(alb)}
+                        >
                             {alb.name}
                         </Button>
                     ))}
@@ -256,7 +315,7 @@ function App() {
 
             {sidebarOpen && <div className="fixed inset-0 bg-black/60 z-40 lg:hidden" onClick={closeSidebar} />}
 
-            {/* Main Content */}
+            {/* MAIN CONTENT */}
             <div className="flex-1 flex flex-col h-full overflow-hidden">
                 <div className="p-4 lg:p-6 border-b border-zinc-800 bg-zinc-900 flex items-center gap-4">
                     <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setSidebarOpen(true)}>
@@ -267,15 +326,23 @@ function App() {
 
                     <div className="relative flex-1 max-w-2xl">
                         <Search className="absolute left-4 top-3.5 w-5 h-5 text-zinc-400" />
-                        <input type="text" placeholder="Search songs..." className="w-full bg-zinc-800 border border-zinc-700 rounded-2xl py-3 pl-12 text-base focus:outline-none focus:border-emerald-500"
-                            value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+                        <input
+                            type="text"
+                            placeholder="Search songs..."
+                            className="w-full bg-zinc-800 border border-zinc-700 rounded-2xl py-3 pl-12 text-base focus:outline-none focus:border-emerald-500"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
                     </div>
                 </div>
 
                 <div className="flex-1 overflow-auto p-4 lg:p-8 pb-36">
                     <h1 className="text-3xl lg:text-4xl font-bold mb-8">
                         {isSearching ? `Results for "${searchTerm}"` : (
-                            <>{currentAlbum.name}{currentAlbum.subtitle && <span className="block text-2xl text-zinc-400 font-medium mt-1">{currentAlbum.subtitle}</span>}</>
+                            <>
+                                {currentAlbum.name}
+                                {currentAlbum.subtitle && <span className="block text-2xl text-zinc-400 font-medium mt-1">{currentAlbum.subtitle}</span>}
+                            </>
                         )}
                     </h1>
 
@@ -283,8 +350,11 @@ function App() {
                         {(isSearching ? searchResults : currentAlbum.tracks).map((item: any, idx: number) => {
                             const isCurrent = !isSearching && idx === currentTrackIndex;
                             return (
-                                <div key={idx} className={`group bg-zinc-900 rounded-xl overflow-hidden cursor-pointer transition-all hover:bg-zinc-800 ${isCurrent ? 'ring-2 ring-emerald-500' : ''}`}
-                                    onClick={() => isSearching ? playSearchResult(item) : loadTrack(idx)}>
+                                <div
+                                    key={idx}
+                                    className={`group bg-zinc-900 rounded-xl overflow-hidden cursor-pointer transition-all hover:bg-zinc-800 ${isCurrent ? 'ring-2 ring-emerald-500' : ''}`}
+                                    onClick={() => isSearching ? playSearchResult(item) : loadTrack(idx)}
+                                >
                                     <div className="relative aspect-square">
                                         <img src={coverArt} alt={item.title} className="w-full h-full object-cover transition-transform group-hover:scale-105" />
                                         <div className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-all">
@@ -294,8 +364,12 @@ function App() {
                                         </div>
                                     </div>
                                     <div className="p-3.5">
-                                        <div className={`font-semibold line-clamp-2 text-sm ${isCurrent ? 'text-emerald-400' : ''}`}>{item.title}</div>
-                                        <div className="text-xs text-zinc-400 mt-1 line-clamp-1">{isSearching ? item.albumName : artistData.artist}</div>
+                                        <div className={`font-semibold line-clamp-2 text-sm ${isCurrent ? 'text-emerald-400' : ''}`}>
+                                            {item.title}
+                                        </div>
+                                        <div className="text-xs text-zinc-400 mt-1 line-clamp-1">
+                                            {isSearching ? item.albumName : artistData.artist}
+                                        </div>
                                     </div>
                                 </div>
                             );
@@ -321,9 +395,13 @@ function App() {
                         </Button>
                         <Button onClick={(e) => { e.stopPropagation(); togglePlay(); }} disabled={isLoadingTrack || !streamUrl}
                             className="w-11 h-11 lg:w-14 lg:h-14 rounded-full bg-white text-black hover:bg-white/90 disabled:opacity-50">
-                            {isLoadingTrack ? <div className="w-5 h-5 border-2 border-zinc-400 border-t-white animate-spin rounded-full" /> 
-                                : isPlaying ? <Pause className="w-5 h-5 lg:w-6 lg:h-6" /> 
-                                : <Play className="w-5 h-5 lg:w-6 lg:h-6" />}
+                            {isLoadingTrack ? (
+                                <div className="w-5 h-5 border-2 border-zinc-400 border-t-white animate-spin rounded-full" />
+                            ) : isPlaying ? (
+                                <Pause className="w-5 h-5 lg:w-6 lg:h-6" />
+                            ) : (
+                                <Play className="w-5 h-5 lg:w-6 lg:h-6" />
+                            )}
                         </Button>
                         <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); handleNext(); }}>
                             <SkipForward className="w-5 h-5" />
@@ -332,7 +410,7 @@ function App() {
                 </div>
             </div>
 
-            {/* EXPANDED FLOATING PLAYER - Improved for Mobile */}
+            {/* EXPANDED PLAYER */}
             {isPlayerExpanded && (
                 <div className="fixed inset-0 bg-zinc-950 z-[70] flex flex-col overflow-hidden">
                     <div className="p-4 flex justify-end">
@@ -360,7 +438,9 @@ function App() {
                             </div>
                             <input
                                 type="range"
-                                min="0" max="100" value={progress}
+                                min="0"
+                                max="100"
+                                value={progress}
                                 onChange={seek}
                                 onMouseUp={handleSeekEnd}
                                 onTouchEnd={handleSeekEnd}
@@ -370,7 +450,7 @@ function App() {
                             />
                         </div>
 
-                        <div className="flex items-center gap-8 mt-4">
+                        <div className="flex items-center gap-8">
                             <Button variant="ghost" size="icon" onClick={handlePrev} className="w-14 h-14">
                                 <SkipBack className="w-8 h-8" />
                             </Button>
@@ -380,6 +460,21 @@ function App() {
                             </Button>
                             <Button variant="ghost" size="icon" onClick={handleNext} className="w-14 h-14">
                                 <SkipForward className="w-8 h-8" />
+                            </Button>
+                        </div>
+
+                        <div className="flex items-center gap-6 text-zinc-400 pt-4">
+                            <Button variant="ghost" size="icon" onClick={() => toggleMode('shuffle')} className={playbackMode === 'shuffle' ? 'text-emerald-400' : ''}>
+                                <Shuffle className="w-6 h-6" />
+                            </Button>
+                            <Button variant="ghost" size="icon" onClick={() => toggleMode('repeat-all')} className={playbackMode === 'repeat-all' ? 'text-emerald-400' : ''}>
+                                <Repeat className="w-6 h-6" />
+                            </Button>
+                            <Button variant="ghost" size="icon" onClick={() => toggleMode('repeat-one')} className={playbackMode === 'repeat-one' ? 'text-emerald-400' : ''}>
+                                <Repeat1 className="w-6 h-6" />
+                            </Button>
+                            <Button variant="ghost" size="icon" onClick={() => toggleMode('sequential')} className={playbackMode === 'sequential' ? 'text-emerald-400' : ''}>
+                                <span className="text-xl font-bold">→</span>
                             </Button>
                         </div>
                     </div>
