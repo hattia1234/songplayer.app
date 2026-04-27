@@ -222,11 +222,8 @@ function App() {
 
     return (
         <div className="flex h-screen bg-zinc-950 text-white overflow-hidden relative">
-            {/* SIDEBAR */}
-            <div className={`${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 fixed lg:relative z-50 
-                w-80 sm:w-72 lg:w-80 bg-zinc-950 h-full transition-transform duration-300 overflow-auto 
-                p-4 lg:p-6 flex flex-col border-r border-zinc-800`}>
-
+            {/* Sidebar + Overlay */}
+            <div className={`${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 fixed lg:relative z-50 w-80 sm:w-72 lg:w-80 bg-zinc-950 h-full transition-transform duration-300 overflow-auto p-4 lg:p-6 flex flex-col border-r border-zinc-800`}>
                 <div className="flex items-center justify-between lg:hidden mb-6 sticky top-0 bg-zinc-950 pb-4 z-10">
                     <div className="flex items-center gap-3">
                         <div className="w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center text-xl">♪</div>
@@ -249,24 +246,17 @@ function App() {
                 <div className="flex-1 overflow-auto pb-32">
                     <div className="text-xs text-zinc-500 mb-3 sticky top-0 bg-zinc-950 py-2 z-10">ALBUMS</div>
                     {artistData.albums.map((alb: any, i: number) => (
-                        <Button
-                            key={i}
-                            variant={currentAlbum.name === alb.name ? "default" : "ghost"}
-                            className="justify-start w-full text-left mb-1.5 py-3 text-base"
-                            onClick={() => switchAlbum(alb)}
-                        >
+                        <Button key={i} variant={currentAlbum.name === alb.name ? "default" : "ghost"}
+                            className="justify-start w-full text-left mb-1.5 py-3 text-base" onClick={() => switchAlbum(alb)}>
                             {alb.name}
                         </Button>
                     ))}
                 </div>
             </div>
 
-            {/* Overlay for mobile sidebar */}
-            {sidebarOpen && (
-                <div className="fixed inset-0 bg-black/60 z-40 lg:hidden" onClick={closeSidebar} />
-            )}
+            {sidebarOpen && <div className="fixed inset-0 bg-black/60 z-40 lg:hidden" onClick={closeSidebar} />}
 
-            {/* MAIN CONTENT */}
+            {/* Main Content */}
             <div className="flex-1 flex flex-col h-full overflow-hidden">
                 <div className="p-4 lg:p-6 border-b border-zinc-800 bg-zinc-900 flex items-center gap-4">
                     <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setSidebarOpen(true)}>
@@ -277,23 +267,15 @@ function App() {
 
                     <div className="relative flex-1 max-w-2xl">
                         <Search className="absolute left-4 top-3.5 w-5 h-5 text-zinc-400" />
-                        <input
-                            type="text"
-                            placeholder="Search songs..."
-                            className="w-full bg-zinc-800 border border-zinc-700 rounded-2xl py-3 pl-12 text-base focus:outline-none focus:border-emerald-500"
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                        />
+                        <input type="text" placeholder="Search songs..." className="w-full bg-zinc-800 border border-zinc-700 rounded-2xl py-3 pl-12 text-base focus:outline-none focus:border-emerald-500"
+                            value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
                     </div>
                 </div>
 
                 <div className="flex-1 overflow-auto p-4 lg:p-8 pb-36">
                     <h1 className="text-3xl lg:text-4xl font-bold mb-8">
                         {isSearching ? `Results for "${searchTerm}"` : (
-                            <>
-                                {currentAlbum.name}
-                                {currentAlbum.subtitle && <span className="block text-2xl text-zinc-400 font-medium mt-1">{currentAlbum.subtitle}</span>}
-                            </>
+                            <>{currentAlbum.name}{currentAlbum.subtitle && <span className="block text-2xl text-zinc-400 font-medium mt-1">{currentAlbum.subtitle}</span>}</>
                         )}
                     </h1>
 
@@ -301,11 +283,8 @@ function App() {
                         {(isSearching ? searchResults : currentAlbum.tracks).map((item: any, idx: number) => {
                             const isCurrent = !isSearching && idx === currentTrackIndex;
                             return (
-                                <div
-                                    key={idx}
-                                    className={`group bg-zinc-900 rounded-xl overflow-hidden cursor-pointer transition-all hover:bg-zinc-800 ${isCurrent ? 'ring-2 ring-emerald-500' : ''}`}
-                                    onClick={() => isSearching ? playSearchResult(item) : loadTrack(idx)}
-                                >
+                                <div key={idx} className={`group bg-zinc-900 rounded-xl overflow-hidden cursor-pointer transition-all hover:bg-zinc-800 ${isCurrent ? 'ring-2 ring-emerald-500' : ''}`}
+                                    onClick={() => isSearching ? playSearchResult(item) : loadTrack(idx)}>
                                     <div className="relative aspect-square">
                                         <img src={coverArt} alt={item.title} className="w-full h-full object-cover transition-transform group-hover:scale-105" />
                                         <div className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-all">
@@ -315,12 +294,8 @@ function App() {
                                         </div>
                                     </div>
                                     <div className="p-3.5">
-                                        <div className={`font-semibold line-clamp-2 text-sm ${isCurrent ? 'text-emerald-400' : ''}`}>
-                                            {item.title}
-                                        </div>
-                                        <div className="text-xs text-zinc-400 mt-1 line-clamp-1">
-                                            {isSearching ? item.albumName : artistData.artist}
-                                        </div>
+                                        <div className={`font-semibold line-clamp-2 text-sm ${isCurrent ? 'text-emerald-400' : ''}`}>{item.title}</div>
+                                        <div className="text-xs text-zinc-400 mt-1 line-clamp-1">{isSearching ? item.albumName : artistData.artist}</div>
                                     </div>
                                 </div>
                             );
@@ -329,11 +304,8 @@ function App() {
                 </div>
             </div>
 
-            {/* MINI PLAYER - Click to Expand */}
-            <div
-                className="fixed bottom-0 left-0 right-0 bg-zinc-900 border-t border-zinc-700 p-3 lg:p-4 z-50 cursor-pointer active:bg-zinc-800 transition-colors"
-                onClick={togglePlayerExpand}
-            >
+            {/* MINI PLAYER */}
+            <div className="fixed bottom-0 left-0 right-0 bg-zinc-900 border-t border-zinc-700 p-3 lg:p-4 z-50 cursor-pointer active:bg-zinc-800 transition-colors" onClick={togglePlayerExpand}>
                 <div className="max-w-5xl mx-auto flex items-center gap-3 lg:gap-6">
                     <div className="flex items-center gap-3 flex-1 min-w-0">
                         {coverArt && <img src={coverArt} alt="cover" className="w-12 h-12 lg:w-14 lg:h-14 object-cover rounded-lg flex-shrink-0" />}
@@ -360,29 +332,29 @@ function App() {
                 </div>
             </div>
 
-            {/* EXPANDED PLAYER */}
+            {/* EXPANDED FLOATING PLAYER - Improved for Mobile */}
             {isPlayerExpanded && (
-                <div className="fixed inset-0 bg-zinc-950 z-[70] flex flex-col">
+                <div className="fixed inset-0 bg-zinc-950 z-[70] flex flex-col overflow-hidden">
                     <div className="p-4 flex justify-end">
                         <Button variant="ghost" size="icon" onClick={() => setIsPlayerExpanded(false)}>
                             <X className="w-7 h-7" />
                         </Button>
                     </div>
 
-                    <div className="flex-1 flex flex-col items-center justify-center p-6 gap-10">
+                    <div className="flex-1 flex flex-col items-center justify-center px-6 py-8 gap-8 overflow-auto">
                         {coverArt && (
-                            <div className="w-full max-w-[420px] aspect-square">
+                            <div className="w-full max-w-[380px] aspect-square">
                                 <img src={coverArt} alt="cover" className="w-full h-full object-cover rounded-3xl shadow-2xl" />
                             </div>
                         )}
 
-                        <div className="text-center max-w-md">
-                            <div className="text-3xl font-bold mb-3">{currentTrack?.title}</div>
-                            <div className="text-xl text-zinc-400">{artistData.artist}</div>
+                        <div className="text-center w-full max-w-md">
+                            <div className="text-2xl sm:text-3xl font-bold mb-2">{currentTrack?.title}</div>
+                            <div className="text-lg text-zinc-400">{artistData.artist}</div>
                         </div>
 
-                        <div className="w-full max-w-md px-4">
-                            <div className="flex justify-between text-sm text-zinc-400 mb-2">
+                        <div className="w-full max-w-md">
+                            <div className="flex justify-between text-sm text-zinc-400 mb-2 px-1">
                                 <span>{formatTime(currentTime)}</span>
                                 <span>{formatTime(duration)}</span>
                             </div>
@@ -398,16 +370,16 @@ function App() {
                             />
                         </div>
 
-                        <div className="flex items-center gap-8">
-                            <Button variant="ghost" size="icon" onClick={handlePrev}>
-                                <SkipBack className="w-9 h-9" />
+                        <div className="flex items-center gap-8 mt-4">
+                            <Button variant="ghost" size="icon" onClick={handlePrev} className="w-14 h-14">
+                                <SkipBack className="w-8 h-8" />
                             </Button>
                             <Button onClick={togglePlay} disabled={isLoadingTrack || !streamUrl}
-                                className="w-24 h-24 rounded-full bg-white text-black hover:bg-white/90 disabled:opacity-50">
-                                {isPlaying ? <Pause className="w-12 h-12" /> : <Play className="w-12 h-12 ml-1" />}
+                                className="w-20 h-20 rounded-full bg-white text-black hover:bg-white/90 disabled:opacity-50">
+                                {isPlaying ? <Pause className="w-10 h-10" /> : <Play className="w-10 h-10 ml-1" />}
                             </Button>
-                            <Button variant="ghost" size="icon" onClick={handleNext}>
-                                <SkipForward className="w-9 h-9" />
+                            <Button variant="ghost" size="icon" onClick={handleNext} className="w-14 h-14">
+                                <SkipForward className="w-8 h-8" />
                             </Button>
                         </div>
                     </div>
