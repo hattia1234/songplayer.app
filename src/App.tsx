@@ -17,7 +17,7 @@ function App() {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [error, setError] = useState(null);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   const [isLoadingTrack, setIsLoadingTrack] = useState(false);
   const [isSeeking, setIsSeeking] = useState(false); // ← NEW
   const audioRef = useRef<HTMLAudioElement>(null);
