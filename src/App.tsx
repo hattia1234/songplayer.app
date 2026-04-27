@@ -127,7 +127,6 @@ function App() {
         }
     };
 
-    // Update audio source
     useEffect(() => {
         const audio = audioRef.current;
         if (!audio || !streamUrl) return;
@@ -135,7 +134,6 @@ function App() {
         audio.load();
     }, [streamUrl]);
 
-    // Audio event listeners
     useEffect(() => {
         const audio = audioRef.current;
         if (!audio) return;
@@ -226,7 +224,7 @@ function App() {
 
     return (
         <div className="flex h-screen bg-zinc-950 text-white overflow-hidden">
-            {/* SIDEBAR */}
+            {/* Sidebar */}
             <div className={`${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 fixed lg:relative z-50 
                 w-80 sm:w-72 lg:w-80 bg-zinc-950 h-full transition-transform duration-300 overflow-auto 
                 p-4 lg:p-6 flex flex-col border-r border-zinc-800`}>
@@ -265,7 +263,7 @@ function App() {
                 </div>
             </div>
 
-            {/* MAIN CONTENT */}
+            {/* Main Content */}
             <div className="flex-1 flex flex-col h-full overflow-hidden">
                 <div className="p-4 lg:p-6 border-b border-zinc-800 bg-zinc-900 flex items-center gap-4">
                     <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setSidebarOpen(true)}>
@@ -328,7 +326,7 @@ function App() {
                 </div>
             </div>
 
-            {/* MINI PLAYER BAR (Click to expand) */}
+            {/* MINI PLAYER */}
             <div
                 className="fixed bottom-0 left-0 right-0 bg-zinc-900 border-t border-zinc-700 p-3 lg:p-4 z-50 cursor-pointer hover:bg-zinc-800 transition-colors"
                 onClick={togglePlayerExpand}
@@ -368,7 +366,7 @@ function App() {
                 </div>
             </div>
 
-            {/* EXPANDED FLOATING PLAYER */}
+            {/* EXPANDED PLAYER */}
             {isPlayerExpanded && (
                 <div className="fixed inset-0 bg-zinc-950 z-[60] flex flex-col">
                     <div className="p-4 flex justify-end">
@@ -380,11 +378,7 @@ function App() {
                     <div className="flex-1 flex flex-col items-center justify-center p-6 gap-10">
                         {coverArt && (
                             <div className="w-full max-w-[420px] aspect-square">
-                                <img 
-                                    src={coverArt} 
-                                    alt="cover" 
-                                    className="w-full h-full object-cover rounded-3xl shadow-2xl" 
-                                />
+                                <img src={coverArt} alt="cover" className="w-full h-full object-cover rounded-3xl shadow-2xl" />
                             </div>
                         )}
 
@@ -403,7 +397,7 @@ function App() {
                                 min="0"
                                 max="100"
                                 value={progress}
-                                onInput={seek}
+                                onChange={seek}           {/* ← Fixed here */}
                                 onMouseUp={handleSeekEnd}
                                 onTouchEnd={handleSeekEnd}
                                 onPointerUp={handleSeekEnd}
