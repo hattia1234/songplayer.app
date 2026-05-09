@@ -2,12 +2,14 @@
 
 import AddictiveCurves from './AddictiveCurves.js';
 import Alice from './Alice.js';
+import ChaosMic from './ChaosMic.js';
 // Import other artists here when you create them
 // import TheWeeknd from './TheWeeknd.js';
 
 const artistSelector = {
   'AddictiveCurves': AddictiveCurves,
-  'Alice': Alice
+  'Alice': Alice,
+  'ChaosMic': ChaosMic
   
   // Add new artists here:
   // 'TheWeeknd': TheWeeknd,
