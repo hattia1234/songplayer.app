@@ -20,7 +20,22 @@ const artistData = {
         { title: "Sovereign Flow", filename: "Sovereign Flow.wav" } ,
         { title: "Suspect Zero", filename: "Suspect Zero.wav" }
       ]
-    }	
+    },
+    {
+      name: "War Chaos",
+      subtitle: "",
+      folder: "WarChaos",
+      cover: "https://i.ibb.co/xqY3H35y/War-Chaos.jpg",
+
+      tracks: [
+       { title: "Do It With Style ", filename: "Do It With Style.mp3" } ,
+       { title: "Not Your Hero ", filename: "Not Your Hero.mp3" } ,
+       { title: "Sequel to Greatness", filename: "Sequel to Greatness.wav" } ,
+       { title: "The Real Problem", filename: "The Real Problem.wav" } ,
+       { title: "War Already Over", filename: "War Already Over.wav" } ,
+       { title: "Your End Game", filename: "Your End Game.wav" } 
+      ]
+    }		
     // Add more albums here later
   ]
 };
