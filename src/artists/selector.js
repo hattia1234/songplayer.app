@@ -9,8 +9,8 @@ import ChaosMic from './ChaosMic.js';
 const artistSelector = {
   'AddictiveCurves': AddictiveCurves,
   'Alice': Alice,
-  'ChaosMic': ChaosMic
-  
+  'ChaosMic': ChaosMic,
+  'RebelRoads': RebelRoads
   // Add new artists here:
   // 'TheWeeknd': TheWeeknd,
 };
