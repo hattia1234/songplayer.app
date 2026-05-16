@@ -3,6 +3,7 @@
 import AddictiveCurves from './AddictiveCurves.js';
 import Alice from './Alice.js';
 import ChaosMic from './ChaosMic.js';
+import RebelRoads from './RebelRoads.js';
 // Import other artists here when you create them
 // import TheWeeknd from './TheWeeknd.js';
 
