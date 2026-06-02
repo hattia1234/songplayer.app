@@ -42,7 +42,22 @@ const artistData = {
         { title: "The Aureal Sphere", filename: "The Aureal Sphere.mp3" } ,
         { title: "The Spirit Weapon", filename: "The Spirit Weapon.mp3" }
       ]
-    }	
+    },
+    {
+      name: "A.L.I.C.E. & The Great Seduction",
+      subtitle: "",
+      folder: "GreatSeduction",
+      cover: "https://i.ibb.co/Gfmk1xYn/Great-Seduction.jpg",
+
+      tracks: [
+        { title: "Bound By Hate", filename: "Bound By Hate.wav" } ,
+        { title: "I Am Your Master", filename: "I Am Your Master.wav" } ,
+        { title: "Poisoned Divinity", filename: "Poisoned Divinity.wav" } ,
+        { title: "Salivate", filename: "Salivate.wav" } ,
+        { title: "The Return of the Temptress", filename: "The Return of the Temptress.wav" } ,
+        { title: "The Sweet Machine", filename: "The Sweet Machine.wav" } 
+      ]
+    }		
     // Add more albums here later
   ]
 };
