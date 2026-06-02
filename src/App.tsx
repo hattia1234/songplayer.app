@@ -9,7 +9,7 @@ function App() {
     const [activeTab, setActiveTab] = useState<'albums' | 'songs'>('albums'); // ← NEW
     
     const [searchTerm, setSearchTerm] = useState("");
-    const [searchResults, setSearchResults] = useState([]);
+//    const [searchResults, setSearchResults] = useState([]);
     const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
     const [streamUrl, setStreamUrl] = useState(null);
     const [coverArt, setCoverArt] = useState(null);
@@ -68,23 +68,10 @@ function App() {
         }
     };
 
-    // Global Search
-    useEffect(() => {
-        if (!artistData || !searchTerm.trim()) {
-            setSearchResults([]);
-            return;
-        }
-        const term = searchTerm.toLowerCase();
-        const results: any[] = [];
-        artistData.albums.forEach((album: any) => {
-            album.tracks.forEach((track: any, trackIndex: number) => {
-                if (track.title.toLowerCase().includes(term)) {
-                    results.push({ ...track, albumName: album.name, globalIndex: trackIndex });
-                }
-            });
-        });
-        setSearchResults(results);
-    }, [searchTerm, artistData]);
+	// Global Search (temporarily disabled to fix build)
+	useEffect(() => {
+		// Search functionality can be re-enabled later
+	}, [searchTerm, artistData]);
 
     const generateShuffledOrder = useCallback(() => {
         if (!currentAlbum) return;
@@ -253,10 +240,10 @@ function App() {
         setSidebarOpen(false);
     };
 
-    const playSearchResult = (result: any) => {
-        const album = artistData.albums.find((a: any) => a.name === result.albumName);
-        if (album) loadTrack(result.globalIndex, album);
-    };
+//    const playSearchResult = (result: any) => {
+//        const album = artistData.albums.find((a: any) => a.name === result.albumName);
+//        if (album) loadTrack(result.globalIndex, album);
+//    };
 
     const formatTime = (secs: number) => {
         if (!secs || isNaN(secs)) return "0:00";
@@ -276,7 +263,7 @@ function App() {
     if (!artistData || !currentAlbum) return <div className="min-h-screen bg-zinc-950 flex items-center justify-center">Loading...</div>;
 
     const currentTrack = currentAlbum.tracks[currentTrackIndex];
-    const isSearching = searchTerm.trim().length > 0;
+//    const isSearching = searchTerm.trim().length > 0;
 
     return (
         <div className="flex h-screen bg-zinc-950 text-white overflow-hidden relative">
