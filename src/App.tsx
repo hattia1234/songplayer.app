@@ -380,43 +380,43 @@ function App() {
 							))}
 						</div>
 					)}
-                    {/* SONGS TAB */}
-                    {activeTab === 'songs' && (
-                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-                            {artistData.albums.flatMap((album: any, albumIdx) =>
-                                album.tracks.map((item: any, idx: number) => {
-                                    const isCurrent = album.name === currentAlbum.name && idx === currentTrackIndex;
-                                    return (
-                                        <div
-                                            key={`${albumIdx}-${idx}`}
-                                            className={`group bg-zinc-900 rounded-xl overflow-hidden cursor-pointer transition-all hover:bg-zinc-800 ${isCurrent ? 'ring-2 ring-emerald-500' : ''}`}
-                                            onClick={() => {
-                                                setCurrentAlbum(album);
-                                                loadTrack(idx, album);
-                                            }}
-                                        >
-                                            <div className="relative aspect-square">
-                                                <img src={coverArt} alt={item.title} className="w-full h-full object-cover transition-transform group-hover:scale-105" />
-                                                <div className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-all">
-                                                    <Button size="icon" className="w-11 h-11 bg-emerald-500 hover:bg-emerald-600 rounded-full">
-                                                        <Play className="w-5 h-5 text-black ml-0.5" />
-                                                    </Button>
-                                                </div>
-                                            </div>
-                                            <div className="p-3.5">
-                                                <div className={`font-semibold line-clamp-2 text-sm ${isCurrent ? 'text-emerald-400' : ''}`}>
-                                                    {item.title}
-                                                </div>
-                                                <div className="text-xs text-zinc-400 mt-1 line-clamp-1">
-                                                    {album.name}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    );
-                                })
-                            )}
-                        </div>
-                    )}
+					{/* SONGS TAB - Card Grid Format */}
+					{activeTab === 'songs' && (
+						<div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+							{currentAlbum?.tracks?.map((track: any, idx: number) => {
+								const isCurrent = idx === currentTrackIndex;
+								
+								return (
+									<div
+										key={idx}
+										className={`group bg-zinc-900 rounded-xl overflow-hidden cursor-pointer transition-all hover:bg-zinc-800 ${isCurrent ? 'ring-2 ring-emerald-500' : ''}`}
+										onClick={() => loadTrack(idx, currentAlbum)}
+									>
+										<div className="relative aspect-square">
+											<img 
+												src={currentAlbum.cover} 
+												alt={track.title} 
+												className="w-full h-full object-cover transition-transform group-hover:scale-105" 
+											/>
+											<div className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-all">
+												<Button size="icon" className="w-11 h-11 bg-emerald-500 hover:bg-emerald-600 rounded-full">
+													<Play className="w-5 h-5 text-black ml-0.5" />
+												</Button>
+											</div>
+										</div>
+										<div className="p-3.5">
+											<div className={`font-semibold line-clamp-2 text-sm ${isCurrent ? 'text-emerald-400' : ''}`}>
+												{track.title}
+											</div>
+											<div className="text-xs text-zinc-400 mt-1 line-clamp-1">
+												{currentAlbum.name}
+											</div>
+										</div>
+									</div>
+								);
+							})}
+						</div>
+					)}
                 </div>
             </div>
 
