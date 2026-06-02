@@ -6,6 +6,8 @@ import getArtistData from '@/artists/selector';
 function App() {
     const [artistData, setArtistData] = useState(null);
     const [currentAlbum, setCurrentAlbum] = useState(null);
+    const [activeTab, setActiveTab] = useState<'albums' | 'songs'>('albums'); // ← NEW
+    
     const [searchTerm, setSearchTerm] = useState("");
     const [searchResults, setSearchResults] = useState([]);
     const [currentTrackIndex, setCurrentTrackIndex] = useState(0);
@@ -244,6 +246,7 @@ function App() {
 
     const switchAlbum = (album: any) => {
         setCurrentAlbum(album);
+        setActiveTab('albums');           // ← NEW: Return to Albums tab when switching
         setSearchTerm("");
         setCurrentTrackIndex(0);
         loadTrack(0, album);
@@ -277,7 +280,7 @@ function App() {
 
     return (
         <div className="flex h-screen bg-zinc-950 text-white overflow-hidden relative">
-            {/* SIDEBAR */}
+            {/* SIDEBAR - unchanged */}
             <div className={`${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 fixed lg:relative z-50 w-80 sm:w-72 lg:w-80 bg-zinc-950 h-full transition-transform duration-300 overflow-auto p-4 lg:p-6 flex flex-col border-r border-zinc-800`}>
                 <div className="flex items-center justify-between lg:hidden mb-6 sticky top-0 bg-zinc-950 pb-4 z-10">
                     <div className="flex items-center gap-3">
@@ -337,44 +340,96 @@ function App() {
                 </div>
 
                 <div className="flex-1 overflow-auto p-4 lg:p-8 pb-36">
-                    <h1 className="text-3xl lg:text-4xl font-bold mb-8">
-                        {isSearching ? `Results for "${searchTerm}"` : (
-                            <>
-                                {currentAlbum.name}
-                                {currentAlbum.subtitle && <span className="block text-2xl text-zinc-400 font-medium mt-1">{currentAlbum.subtitle}</span>}
-                            </>
-                        )}
+                    <h1 className="text-3xl lg:text-4xl font-bold mb-6">
+                        {artistData.artist}
                     </h1>
 
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-                        {(isSearching ? searchResults : currentAlbum.tracks).map((item: any, idx: number) => {
-                            const isCurrent = !isSearching && idx === currentTrackIndex;
-                            return (
-                                <div
-                                    key={idx}
-                                    className={`group bg-zinc-900 rounded-xl overflow-hidden cursor-pointer transition-all hover:bg-zinc-800 ${isCurrent ? 'ring-2 ring-emerald-500' : ''}`}
-                                    onClick={() => isSearching ? playSearchResult(item) : loadTrack(idx)}
-                                >
-                                    <div className="relative aspect-square">
-                                        <img src={coverArt} alt={item.title} className="w-full h-full object-cover transition-transform group-hover:scale-105" />
-                                        <div className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-all">
-                                            <Button size="icon" className="w-11 h-11 bg-emerald-500 hover:bg-emerald-600 rounded-full">
-                                                <Play className="w-5 h-5 text-black ml-0.5" />
-                                            </Button>
-                                        </div>
-                                    </div>
-                                    <div className="p-3.5">
-                                        <div className={`font-semibold line-clamp-2 text-sm ${isCurrent ? 'text-emerald-400' : ''}`}>
-                                            {item.title}
-                                        </div>
-                                        <div className="text-xs text-zinc-400 mt-1 line-clamp-1">
-                                            {isSearching ? item.albumName : artistData.artist}
-                                        </div>
-                                    </div>
-                                </div>
-                            );
-                        })}
+                    {/* TABS - NEW */}
+                    <div className="flex border-b border-zinc-800 mb-8">
+                        <button
+                            onClick={() => setActiveTab('albums')}
+                            className={`px-8 py-4 font-medium text-lg transition-all ${activeTab === 'albums' 
+                                ? 'border-b-2 border-emerald-500 text-white' 
+                                : 'text-zinc-400 hover:text-zinc-200'}`}
+                        >
+                            Albums
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('songs')}
+                            className={`px-8 py-4 font-medium text-lg transition-all ${activeTab === 'songs' 
+                                ? 'border-b-2 border-emerald-500 text-white' 
+                                : 'text-zinc-400 hover:text-zinc-200'}`}
+                        >
+                            Songs
+                        </button>
                     </div>
+
+					{/* ALBUMS TAB */}
+					{activeTab === 'albums' && (
+						<div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
+							{artistData.albums.map((alb: any, i: number) => (
+								<div
+									key={i}
+									className={`group bg-zinc-900 rounded-2xl overflow-hidden cursor-pointer transition-all hover:bg-zinc-800 ${currentAlbum?.name === alb.name ? 'ring-2 ring-emerald-500' : ''}`}
+									onClick={() => switchAlbum(alb)}
+								>
+									<div className="relative aspect-square">
+										<img 
+											src={alb.cover} 
+											alt={alb.name} 
+											className="w-full h-full object-cover transition-transform group-hover:scale-105" 
+										/>
+										<div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-all">
+											<Button size="icon" className="w-12 h-12 bg-emerald-500 hover:bg-emerald-600 rounded-full">
+												<Play className="w-6 h-6 text-black" />
+											</Button>
+										</div>
+									</div>
+									<div className="p-4">
+										<div className="font-semibold line-clamp-2">{alb.name}</div>
+										{alb.subtitle && <div className="text-sm text-zinc-400 mt-1">{alb.subtitle}</div>}
+									</div>
+								</div>
+							))}
+						</div>
+					)}
+                    {/* SONGS TAB */}
+                    {activeTab === 'songs' && (
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+                            {artistData.albums.flatMap((album: any, albumIdx) =>
+                                album.tracks.map((item: any, idx: number) => {
+                                    const isCurrent = album.name === currentAlbum.name && idx === currentTrackIndex;
+                                    return (
+                                        <div
+                                            key={`${albumIdx}-${idx}`}
+                                            className={`group bg-zinc-900 rounded-xl overflow-hidden cursor-pointer transition-all hover:bg-zinc-800 ${isCurrent ? 'ring-2 ring-emerald-500' : ''}`}
+                                            onClick={() => {
+                                                setCurrentAlbum(album);
+                                                loadTrack(idx, album);
+                                            }}
+                                        >
+                                            <div className="relative aspect-square">
+                                                <img src={coverArt} alt={item.title} className="w-full h-full object-cover transition-transform group-hover:scale-105" />
+                                                <div className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-all">
+                                                    <Button size="icon" className="w-11 h-11 bg-emerald-500 hover:bg-emerald-600 rounded-full">
+                                                        <Play className="w-5 h-5 text-black ml-0.5" />
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                            <div className="p-3.5">
+                                                <div className={`font-semibold line-clamp-2 text-sm ${isCurrent ? 'text-emerald-400' : ''}`}>
+                                                    {item.title}
+                                                </div>
+                                                <div className="text-xs text-zinc-400 mt-1 line-clamp-1">
+                                                    {album.name}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    );
+                                })
+                            )}
+                        </div>
+                    )}
                 </div>
             </div>
 
