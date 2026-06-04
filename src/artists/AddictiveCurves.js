@@ -86,7 +86,8 @@ const artistData = {
        { title: "Come Back To Me", filename:"Come Back To Me.wav" },
        { title: "Feel The Ache", filename:"Feel The Ache.wav" },
        { title: "Numb", filename:"Numb.wav" },
-       { title: "Sweet Temptation", filename:"Sweet Temptation.wav" },      ]
+       { title: "Sweet Temptation", filename:"Sweet Temptation.wav" }
+    ]
     },
 
     {
@@ -100,7 +101,7 @@ const artistData = {
        { title: "Only with You", filename:"Only with You.wav" },
        { title: "Our Destiny", filename:"Our Destiny.wav" },
        { title: "Siempre Fuego", filename:"Siempre Fuego.wav" },
-       { title: "Tonight", filename:"Tonight.wav" },
+       { title: "Tonight", filename:"Tonight.wav" }
       ]
     },
 
