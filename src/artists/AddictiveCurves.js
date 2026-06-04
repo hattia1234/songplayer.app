@@ -8,7 +8,7 @@ const artistData = {
     {
       name: "Vol I: In Plain Sight",
       folder: "InPlainSight",
-      cover: "https://i.ibb.co/CfbBxmh/Inplainsight.jpg"
+      cover: "https://i.ibb.co/CfbBxmh/Inplainsight.jpg",
       tracks: [
         { title: "Burning Bridges (DJ Mix)", filename: "Burning Bridges (DJ Mix).mp3" },
         { title: "BurningBridges", filename: "BurningBridges.mp3" },
