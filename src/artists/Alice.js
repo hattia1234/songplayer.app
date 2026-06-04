@@ -57,7 +57,23 @@ const artistData = {
         { title: "The Return of the Temptress", filename: "The Return of the Temptress.wav" } ,
         { title: "The Sweet Machine", filename: "The Sweet Machine.wav" } 
       ]
+    },
+    {
+      name: "Down The A.L.I.C.E. Hole",
+      subtitle: "",
+      folder: "DownTheAliceHole",
+      cover: "https://i.ibb.co/5WFnRQTx/Down-The-Alice-Hole.jpg",
+
+      tracks: [
+        { title: "Agents from Hell", filename: "Agents from Hell.wav" } ,
+        { title: "Ghost Without A Name", filename: "Ghost Without A Name.wav" } ,
+        { title: "I Am Fire", filename: "I Am Fire.wav" } ,
+        { title: "Mirror Soul", filename: "Mirror Soul.wav" } ,
+        { title: "No More Secrets", filename: "No More Secrets.wav" } ,
+        { title: "Synthetic Dreams", filename: "Synthetic Dreams.wav" } 	  
+      ]
     }		
+	
     // Add more albums here later
   ]
 };
