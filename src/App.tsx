@@ -171,13 +171,12 @@ function App() {
             if (!audioUrl) {
                 console.log(`[CACHE MISS] Downloading full MP3: ${cacheKey}`);
 
-                // Get signed URL
-                const audioRes = await fetch(
+                // Get signed URL (we still need this call)
+                await fetch(
                     `/.netlify/functions/stream?artist=${artistKeyRef.current}&album=${album.folder}&track=${encodeURIComponent(track.filename)}`
                 );
-                const audioData = await audioRes.json();
 
-                // Proxy through Netlify to avoid CORS
+                // Proxy through Netlify to avoid CORS and get the blob
                 const blobRes = await fetch(
                     `/.netlify/functions/stream?artist=${artistKeyRef.current}&album=${album.folder}&track=${encodeURIComponent(track.filename)}&proxy=true`
                 );
@@ -206,7 +205,6 @@ function App() {
             setIsLoadingTrack(false);
         }
     };
-
     // Auto play after new track loads
     useEffect(() => {
         const audio = audioRef.current;
