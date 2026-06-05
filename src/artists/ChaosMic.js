@@ -12,13 +12,13 @@ const artistData = {
       cover: "https://i.ibb.co/jv4Y71WP/Alpha-Masters-Of-Chaos.jpg",
 
       tracks: [
-        { title: "Battle Craze", filename: "Battle Craze.wav" } ,
+        { title: "Battle Craze", filename: "Battle Craze.mp3" } ,
         { title: "Find Out Why You Lose", filename: "Find Out Why You Lose.mp3" } ,
         { title: "Follow Your Leader", filename: "Follow Your Leader.mp3" } ,
-        { title: "Master Of Rappermonies", filename: "Master Of Rappermonies.wav" } ,
+        { title: "Master Of Rappermonies", filename: "Master Of Rappermonies.mp3" } ,
         { title: "Meet Your Doom", filename: "Meet Your Doom.mp3" } ,
-        { title: "Sovereign Flow", filename: "Sovereign Flow.wav" } ,
-        { title: "Suspect Zero", filename: "Suspect Zero.wav" }
+        { title: "Sovereign Flow", filename: "Sovereign Flow.mp3" } ,
+        { title: "Suspect Zero", filename: "Suspect Zero.mp3" }
       ]
     },
     {
@@ -30,10 +30,10 @@ const artistData = {
       tracks: [
        { title: "Do It With Style ", filename: "Do It With Style.mp3" } ,
        { title: "Not Your Hero ", filename: "Not Your Hero.mp3" } ,
-       { title: "Sequel to Greatness", filename: "Sequel to Greatness.wav" } ,
-       { title: "The Real Problem", filename: "The Real Problem.wav" } ,
-       { title: "War Already Over", filename: "War Already Over.wav" } ,
-       { title: "Your End Game", filename: "Your End Game.wav" } 
+       { title: "Sequel to Greatness", filename: "Sequel to Greatness.mp3" } ,
+       { title: "The Real Problem", filename: "The Real Problem.mp3" } ,
+       { title: "War Already Over", filename: "War Already Over.mp3" } ,
+       { title: "Your End Game", filename: "Your End Game.mp3" } 
       ]
     }		
     // Add more albums here later
