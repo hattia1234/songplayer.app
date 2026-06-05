@@ -50,12 +50,12 @@ const artistData = {
       cover: "https://i.ibb.co/Gfmk1xYn/Great-Seduction.jpg",
 
       tracks: [
-        { title: "Bound By Hate", filename: "Bound By Hate.wav" } ,
-        { title: "I Am Your Master", filename: "I Am Your Master.wav" } ,
-        { title: "Poisoned Divinity", filename: "Poisoned Divinity.wav" } ,
-        { title: "Salivate", filename: "Salivate.wav" } ,
-        { title: "The Return of the Temptress", filename: "The Return of the Temptress.wav" } ,
-        { title: "The Sweet Machine", filename: "The Sweet Machine.wav" } 
+        { title: "Bound By Hate", filename: "Bound By Hate.mp3" } ,
+        { title: "I Am Your Master", filename: "I Am Your Master.mp3" } ,
+        { title: "Poisoned Divinity", filename: "Poisoned Divinity.mp3" } ,
+        { title: "Salivate", filename: "Salivate.mp3" } ,
+        { title: "The Return of the Temptress", filename: "The Return of the Temptress.mp3" } ,
+        { title: "The Sweet Machine", filename: "The Sweet Machine.mp3" } 
       ]
     },
     {
@@ -65,12 +65,12 @@ const artistData = {
       cover: "https://i.ibb.co/5WFnRQTx/Down-The-Alice-Hole.jpg",
 
       tracks: [
-        { title: "Agents from Hell", filename: "Agents from Hell.wav" } ,
-        { title: "Ghost Without A Name", filename: "Ghost Without A Name.wav" } ,
-        { title: "I Am Fire", filename: "I Am Fire.wav" } ,
-        { title: "Mirror Soul", filename: "Mirror Soul.wav" } ,
-        { title: "No More Secrets", filename: "No More Secrets.wav" } ,
-        { title: "Synthetic Dreams", filename: "Synthetic Dreams.wav" } 	  
+        { title: "Agents from Hell", filename: "Agents from Hell.mp3" } ,
+        { title: "Ghost Without A Name", filename: "Ghost Without A Name.mp3" } ,
+        { title: "I Am Fire", filename: "I Am Fire.mp3" } ,
+        { title: "Mirror Soul", filename: "Mirror Soul.mp3" } ,
+        { title: "No More Secrets", filename: "No More Secrets.mp3" } ,
+        { title: "Synthetic Dreams", filename: "Synthetic Dreams.mp3" } 	  
       ]
     }		
 	

@@ -65,13 +65,13 @@ const artistData = {
       cover: "https://i.ibb.co/ccR6Px97/Bounce-Higher.jpg",
 
       tracks: [
-       { title: "Again And Again", filename:"Again And Again.wav" },
-       { title: "Always You", filename:"Always You.wav" },
-       { title: "Feel the Fire", filename:"Feel the Fire.wav" },
-       { title: "Keep It Moving", filename:"Keep It Moving.wav" },
-       { title: "Liar! Liar!", filename:"Liar! Liar!.wav" },
-       { title: "Magnetic Attraction", filename:"Magnetic Attraction.wav" },
-       { title: "No Holding Back", filename:"No Holding Back.wav" }
+       { title: "Again And Again", filename:"Again And Again.mp3" },
+       { title: "Always You", filename:"Always You.mp3" },
+       { title: "Feel the Fire", filename:"Feel the Fire.mp3" },
+       { title: "Keep It Moving", filename:"Keep It Moving.mp3" },
+       { title: "Liar! Liar!", filename:"Liar! Liar!.mp3" },
+       { title: "Magnetic Attraction", filename:"Magnetic Attraction.mp3" },
+       { title: "No Holding Back", filename:"No Holding Back.mp3" }
       ]
     },
     {
@@ -80,13 +80,13 @@ const artistData = {
       cover: "https://i.ibb.co/Y4wj7Qng/Curves-Touching.jpg",
 
       tracks: [
-       { title: "A Beautiful Moment", filename:"A Beautiful Moment.wav" },
-       { title: "Breaking Down Inside", filename:"Breaking Down Inside.wav" },
-       { title: "Catch Me If You Can", filename:"Catch Me If You Can.wav" },
-       { title: "Come Back To Me", filename:"Come Back To Me.wav" },
-       { title: "Feel The Ache", filename:"Feel The Ache.wav" },
-       { title: "Numb", filename:"Numb.wav" },
-       { title: "Sweet Temptation", filename:"Sweet Temptation.wav" }
+       { title: "A Beautiful Moment", filename:"A Beautiful Moment.mp3" },
+       { title: "Breaking Down Inside", filename:"Breaking Down Inside.mp3" },
+       { title: "Catch Me If You Can", filename:"Catch Me If You Can.mp3" },
+       { title: "Come Back To Me", filename:"Come Back To Me.mp3" },
+       { title: "Feel The Ache", filename:"Feel The Ache.mp3" },
+       { title: "Numb", filename:"Numb.mp3" },
+       { title: "Sweet Temptation", filename:"Sweet Temptation.mp3" }
     ]
     },
 
@@ -96,12 +96,12 @@ const artistData = {
       cover: "https://i.ibb.co/4RDKMMz5/Bounce-With-Passion.jpg",
 
       tracks: [
-       { title: "I Give It All", filename:"I Give It All.wav" },
-       { title: "Love Waiting For Love", filename:"Love Waiting For Love.wav" },
-       { title: "Only with You", filename:"Only with You.wav" },
-       { title: "Our Destiny", filename:"Our Destiny.wav" },
-       { title: "Siempre Fuego", filename:"Siempre Fuego.wav" },
-       { title: "Tonight", filename:"Tonight.wav" }
+       { title: "I Give It All", filename:"I Give It All.mp3" },
+       { title: "Love Waiting For Love", filename:"Love Waiting For Love.mp3" },
+       { title: "Only with You", filename:"Only with You.mp3" },
+       { title: "Our Destiny", filename:"Our Destiny.mp3" },
+       { title: "Siempre Fuego", filename:"Siempre Fuego.mp3" },
+       { title: "Tonight", filename:"Tonight.mp3" }
       ]
     },
 

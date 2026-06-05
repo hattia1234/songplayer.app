@@ -31,6 +31,72 @@ function App() {
     const artistKeyRef = useRef(null);
     const shouldAutoPlayRef = useRef(true);
 
+    // ==================== INDEXEDDB FULL MP3 CACHING (Minimal) ====================
+    const DB_NAME = 'GrokifyAudioCache';
+    const STORE_NAME = 'tracks';
+
+    const openDB = (): Promise<IDBDatabase> => {
+        return new Promise((resolve, reject) => {
+            const request = indexedDB.open(DB_NAME, 2);
+            request.onerror = () => reject(request.error);
+            request.onsuccess = () => resolve(request.result);
+            request.onupgradeneeded = (event) => {
+                const db = (event.target as IDBOpenDBRequest).result;
+                if (!db.objectStoreNames.contains(STORE_NAME)) {
+                    db.createObjectStore(STORE_NAME, { keyPath: 'cacheKey' });
+                }
+            };
+        });
+    };
+
+    const getCachedAudio = async (cacheKey: string): Promise<string | null> => {
+        try {
+            const db = await openDB();
+            return new Promise((resolve) => {
+                const tx = db.transaction(STORE_NAME, 'readonly');
+                const store = tx.objectStore(STORE_NAME);
+                const req = store.get(cacheKey);
+                req.onsuccess = () => {
+                    if (req.result && req.result.blob) {
+                        const objectUrl = URL.createObjectURL(req.result.blob);
+                        resolve(objectUrl);
+                    } else {
+                        resolve(null);
+                    }
+                    db.close();
+                };
+                req.onerror = () => { resolve(null); db.close(); };
+            });
+        } catch (e) {
+            console.warn(`[IndexedDB] Read failed for ${cacheKey}`, e);
+            return null;
+        }
+    };
+
+    const cacheAudioFile = async (cacheKey: string, audioBlob: Blob): Promise<void> => {
+        try {
+            const db = await openDB();
+            return new Promise((resolve) => {
+                const tx = db.transaction(STORE_NAME, 'readwrite');
+                const store = tx.objectStore(STORE_NAME);
+                store.put({ 
+                    cacheKey, 
+                    blob: audioBlob, 
+                    timestamp: Date.now() 
+                });
+                tx.oncomplete = () => { resolve(); db.close(); };
+                tx.onerror = () => { 
+                    console.warn(`[IndexedDB] Write failed for ${cacheKey}`); 
+                    db.close(); 
+                    resolve(); 
+                };
+            });
+        } catch (e) {
+            console.warn(`[IndexedDB] Cache failed for ${cacheKey}`, e);
+        }
+    };
+    // ==================== END FULL MP3 CACHING ====================
+
     // Initialize
     useEffect(() => {
         const urlParams = new URLSearchParams(window.location.search);
@@ -97,17 +163,39 @@ function App() {
         setIsSeeking(false);
 
         const track = album.tracks[trackIndex];
+        const cacheKey = `${artistKeyRef.current}/${album.folder}/${track.filename}`;
 
         try {
-            const audioRes = await fetch(
-                `/.netlify/functions/stream?artist=${artistKeyRef.current}&album=${album.folder}&track=${encodeURIComponent(track.filename)}`
-            );
-            const audioData = await audioRes.json();
+            let audioUrl = await getCachedAudio(cacheKey);
+
+            if (!audioUrl) {
+                console.log(`[CACHE MISS] Downloading full MP3: ${cacheKey}`);
+
+                // Get signed URL
+                const audioRes = await fetch(
+                    `/.netlify/functions/stream?artist=${artistKeyRef.current}&album=${album.folder}&track=${encodeURIComponent(track.filename)}`
+                );
+                const audioData = await audioRes.json();
+
+                // Proxy through Netlify to avoid CORS
+                const blobRes = await fetch(
+                    `/.netlify/functions/stream?artist=${artistKeyRef.current}&album=${album.folder}&track=${encodeURIComponent(track.filename)}&proxy=true`
+                );
+
+                if (!blobRes.ok) throw new Error(`Proxy failed: ${blobRes.status}`);
+
+                const audioBlob = await blobRes.blob();
+
+                await cacheAudioFile(cacheKey, audioBlob);
+                audioUrl = URL.createObjectURL(audioBlob);
+            } else {
+                console.log(`[CACHE HIT - Full MP3] ${cacheKey}`);
+            }
 
             const coverRes = await fetch(`/.netlify/functions/image?track=${encodeURIComponent(album.cover)}`);
             const coverData = await coverRes.json();
 
-            setStreamUrl(audioData.url);
+            setStreamUrl(audioUrl);
             setCoverArt(coverData.coverArt || coverData.url);
             setCurrentTrackIndex(trackIndex);
             setCurrentAlbum(album);

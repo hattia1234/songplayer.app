@@ -3,8 +3,9 @@ export default async function handler(request) {
   const artist = url.searchParams.get('artist');
   const album = url.searchParams.get('album');
   const track = url.searchParams.get('track');
+  const proxy = url.searchParams.get('proxy');   // ← NEW
 
-  console.log(`[REQUEST] album=${album}, track=${track}`);
+  console.log(`[REQUEST] album=${album}, track=${track}, proxy=${proxy}`);
 
   if (!artist || !album || !track) {
     return new Response(JSON.stringify({ error: "Missing parameters" }), { status: 400 });
@@ -17,7 +18,6 @@ export default async function handler(request) {
     });
   }
 
-  // Audio from B2
   const filePath = `${album}/${track}`;
 
   try {
@@ -26,11 +26,7 @@ export default async function handler(request) {
       headers: { Authorization: `Basic ${authString}` }
     });
 
-    if (!authRes.ok) {
-      const errorText = await authRes.text();
-      console.error(`[B2 AUTH ERROR] ${authRes.status} - ${errorText}`);
-      return new Response(JSON.stringify({ error: errorText }), { status: authRes.status });
-    }
+    if (!authRes.ok) throw new Error("B2 auth failed");
 
     const auth = await authRes.json();
 
@@ -44,18 +40,25 @@ export default async function handler(request) {
       })
     });
 
-    if (!downloadAuthRes.ok) {
-      const errorText = await downloadAuthRes.text();
-      console.error(`[B2 DOWNLOAD AUTH ERROR] ${downloadAuthRes.status} - ${errorText}`);
-      return new Response(JSON.stringify({ error: errorText }), { 
-        status: downloadAuthRes.status 
+    if (!downloadAuthRes.ok) throw new Error("Download auth failed");
+
+    const downloadAuth = await downloadAuthRes.json();
+    const signedUrl = `${auth.downloadUrl}/file/${process.env.B2_BUCKET}/${encodeURIComponent(filePath)}?Authorization=${downloadAuth.authorizationToken}`;
+
+    // === NEW: Proxy mode for full file download (avoids CORS) ===
+    if (proxy === 'true') {
+      const fileRes = await fetch(signedUrl);
+      if (!fileRes.ok) throw new Error(`File fetch failed: ${fileRes.status}`);
+
+      return new Response(fileRes.body, {
+        headers: {
+          'Content-Type': fileRes.headers.get('Content-Type') || 'audio/mpeg',
+          'Content-Length': fileRes.headers.get('Content-Length'),
+        }
       });
     }
 
-    const downloadAuth = await downloadAuthRes.json();
-
-    const signedUrl = `${auth.downloadUrl}/file/${process.env.B2_BUCKET}/${encodeURIComponent(filePath)}?Authorization=${downloadAuth.authorizationToken}`;
-
+    // Default: Return signed URL (for normal use)
     return new Response(JSON.stringify({ url: signedUrl }), {
       headers: { "Content-Type": "application/json" }
     });
