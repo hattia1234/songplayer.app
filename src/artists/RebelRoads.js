@@ -43,6 +43,27 @@ const artistData = {
        { title: "White Water Ghost", filename: "White Water Ghost.mp3" } ,
        { title: "Wrench and Wire", filename: "Wrench and Wire.mp3" } 
       ]
+    },
+    {
+      name: "Chrome Birds and Runaway Girls",
+      subtitle: "",
+      folder: "ChromeBirds",
+      cover: "https://i.ibb.co/99rsLVfP/Chrome-Birds.jpg",
+
+      tracks: [
+
+       { title: "Catch The Heat", filename: "Catch The Heat.mp3" } ,
+       { title: "Chrome Birds (Country Cut)", filename: "Chrome Birds (Country Cut).mp3" } ,
+       { title: "Devil In my Stirups", filename: "Devil In my Stirups.mp3" } ,
+       { title: "Never Coming Back", filename: "Never Coming Back.mp3" } ,
+       { title: "Outlaw's Reckoning", filename: "Outlaw's Reckoning.mp3" } ,
+       { title: "Racing For The Whiskey", filename: "Racing For The Whiskey.mp3" } ,
+       { title: "Riding Out", filename: "Riding Out.mp3" } ,
+       { title: "Running For The Exit", filename: "Running For The Exit.mp3" } ,
+       { title: "The Final Chase", filename: "The Final Chase.mp3" } ,
+       { title: "White Lines Cutting In The Dark", filename: "White Lines Cutting In The Dark.mp3" } ,
+       { title: "Wide Open Throttle", filename: "Wide Open Throttle.mp3" } 
+	  ]
     }		
     // Add more albums here later
   ]
