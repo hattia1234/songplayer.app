@@ -103,7 +103,7 @@ const artistData = {
        { title: "Siempre Fuego", filename:"Siempre Fuego.mp3" },
        { title: "Tonight", filename:"Tonight.mp3" }
       ]
-    },
+    }
 
 
 	
