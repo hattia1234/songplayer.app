@@ -4,5 +4,5 @@
 
 [functions]
   directory = "netlify/functions"
-  included_files = ["node_modules/music-metadata/**"]
-  included_files = ["node_modules/stripe/**"]
+  included_files = ["node_modules/music-metadata/**", "node_modules/stripe/**"]
+  
