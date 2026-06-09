@@ -1,8 +1,8 @@
 [build]
   command = "npm run build"
   publish = "dist"
-  functions = "netlify/functions"
 
 [functions]
-  node_bundler = "esbuild"
-  external = ["stripe"]
+  directory = "netlify/functions"
+  included_files = ["node_modules/music-metadata/**"]
+  included_files = ["node_modules/stripe/**"]
