@@ -40,3 +40,5 @@ dist
 build.env 
 .env.* 
 vite-env.d.ts 
+.env 
+.env.local 
