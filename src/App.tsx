@@ -2,6 +2,7 @@ import { useEffect, useState, useRef, useCallback } from 'react';
 import { Play, Pause, SkipBack, SkipForward, Search, X, Shuffle, Repeat, Repeat1 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import getArtistData from '@/artists/selector';
+import SubscriptionGuard from '@/SubscriptionGuard'; // for subscriptions
 
 function App() {
     const [artistData, setArtistData] = useState(null);
@@ -350,8 +351,11 @@ function App() {
 
     const currentTrack = currentAlbum.tracks[currentTrackIndex];
 //    const isSearching = searchTerm.trim().length > 0;
+    const urlParams = new URLSearchParams(window.location.search);
+    const artistKey = urlParams.get('artist');
 
     return (
+	<SubscriptionGuard artistKey={artistKey}>
         <div className="flex h-screen bg-zinc-950 text-white overflow-hidden relative">
             {/* SIDEBAR - unchanged */}
             <div className={`${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 fixed lg:relative z-50 w-80 sm:w-72 lg:w-80 bg-zinc-950 h-full transition-transform duration-300 overflow-auto p-4 lg:p-6 flex flex-col border-r border-zinc-800`}>
@@ -611,6 +615,7 @@ function App() {
 
             <audio ref={audioRef} />
         </div>
+	</SubscriptionGuard>
     );
 }
 
