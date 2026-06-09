@@ -1,15 +1,19 @@
+# netlify.toml
 [build]
   command = "npm run build"
-  publish = "dist"
   functions = "netlify/functions"
+  publish = "dist"
 
+# Explicit function configuration
 [functions]
-  directory = "netlify/functions"
   node_bundler = "esbuild"
-  external = ["stripe"]
-  included_files = ["node_modules/stripe/**"]
+  external = ["stripe"]   # Important for stripe
 
-# Explicit for subscription functions
+# Environment variables for functions
+[build.environment]
+  NODE_VERSION = "20"
+
+# Function-specific settings
 [[functions]]
   pattern = "subscription-*"
   node_bundler = "esbuild"
