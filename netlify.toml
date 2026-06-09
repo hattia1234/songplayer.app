@@ -6,9 +6,3 @@
 [functions]
   node_bundler = "esbuild"
   external = ["stripe"]
-
-# Subscription functions configuration
-[[functions]]
-  pattern = "subscription-*"
-  node_bundler = "esbuild"
-  external = ["stripe"]
