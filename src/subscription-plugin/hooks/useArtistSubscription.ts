@@ -2,17 +2,9 @@
 import { useState, useEffect } from 'react';
 import { getCachedSubscription, cacheSubscription } from '../core/indexeddb-cache';
 
-interface CachedSubscription {
-  isActive: boolean;
-  expiresAt?: string;
-  status?: 'active' | 'cancelled' | 'none';
-}
-
 export function useArtistSubscription(artistKey: string | null, userEmail?: string) {
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [subscriptionStatus, setSubscriptionStatus] = useState<'active' | 'cancelled' | 'none'>('none');
-  const [expiresAt, setExpiresAt] = useState<string | null>(null);
 
   useEffect(() => {
     if (!artistKey) {
@@ -21,12 +13,10 @@ export function useArtistSubscription(artistKey: string | null, userEmail?: stri
     }
 
     const checkSubscription = async () => {
-      const cached = await getCachedSubscription(artistKey) as CachedSubscription | null;
+      const cached = await getCachedSubscription(artistKey);
 
       if (cached && cached.isActive && !userEmail) {
         setIsSubscribed(true);
-        setSubscriptionStatus('active');
-        setExpiresAt(cached.expiresAt || null);
         setLoading(false);
         return;
       }
@@ -46,11 +36,9 @@ export function useArtistSubscription(artistKey: string | null, userEmail?: stri
           const expiresAtDate = new Date();
           expiresAtDate.setDate(expiresAtDate.getDate() + 30);
 
-          await cacheSubscription(artistKey, active, expiresAtDate.toISOString(), active ? 'active' : 'cancelled');
+          await cacheSubscription(artistKey, active, expiresAtDate.toISOString());
 
           setIsSubscribed(active);
-          setSubscriptionStatus(active ? 'active' : 'cancelled');
-          setExpiresAt(expiresAtDate.toISOString());
         }
       } catch (err) {
         console.warn("[Subscription Plugin] Stripe check failed", err);
@@ -67,11 +55,5 @@ export function useArtistSubscription(artistKey: string | null, userEmail?: stri
     window.location.href = `/.netlify/functions/subscription-create-checkout?artist=${encodeURIComponent(artistKey)}`;
   };
 
-  return { 
-    isSubscribed, 
-    loading, 
-    subscribeToArtist,
-    subscriptionStatus,
-    expiresAt 
-  };
+  return { isSubscribed, loading, subscribeToArtist };
 }

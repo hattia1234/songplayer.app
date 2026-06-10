@@ -4,16 +4,21 @@ export default async function handler(request) {
   const artistKey = url.searchParams.get('artist');
   const email = request.headers.get('x-user-email');
 
-  console.log(`[CHECK] artist="${artistKey}", email="${email}"`);
+  console.log(`[CHECK] artist="${artistKey}", email="${email || 'NONE'}"`);
 
-  if (!artistKey || !email) {
+  if (!artistKey) {
     return new Response(JSON.stringify({ isActive: false }), { status: 400 });
   }
 
   const expectedPriceId = process.env[`STRIPE_PRICE_${artistKey.toUpperCase()}`];
+
   if (!expectedPriceId) {
-    console.error(`No price ID configured for ${artistKey}`);
+    console.error(`[CHECK] No price ID configured for ${artistKey}`);
     return new Response(JSON.stringify({ isActive: false }), { status: 400 });
+  }
+
+  if (!email) {
+    return new Response(JSON.stringify({ isActive: false }), { status: 200 });
   }
 
   try {
@@ -32,17 +37,14 @@ export default async function handler(request) {
       });
 
       for (const sub of subscriptions.data) {
-        const subPriceId = sub.items?.data[0]?.price?.id;
-        console.log(`[CHECK] Found priceId="${subPriceId}"`);
-
-        if (subPriceId === expectedPriceId) {
-          console.log(`[CHECK] MATCH FOUND using priceId for ${artistKey}`);
+        const priceId = sub.items?.data[0]?.price?.id;
+        if (priceId === expectedPriceId) {
+          console.log(`[CHECK] MATCH FOUND using price_id for ${artistKey}`);
           return new Response(JSON.stringify({ isActive: true }));
         }
       }
     }
 
-    console.log(`[CHECK] No match found using priceId`);
     return new Response(JSON.stringify({ isActive: false }));
 
   } catch (error) {
