@@ -1,6 +1,11 @@
 // src/subscription-plugin/hooks/useArtistSubscription.ts
 import { useState, useEffect } from 'react';
 import { getCachedSubscription, cacheSubscription } from '../core/indexeddb-cache';
+interface CachedSubscription {
+  isActive: boolean;
+
+  // add any other properties you use from cache if needed
+}
 
 export function useArtistSubscription(artistKey: string | null, userEmail?: string) {
   const [isSubscribed, setIsSubscribed] = useState(false);
@@ -15,7 +20,7 @@ export function useArtistSubscription(artistKey: string | null, userEmail?: stri
     const checkSubscription = async () => {
       const cached = await getCachedSubscription(artistKey);
 
-      if (cached && cached.isActive && !userEmail) {
+      if (cached && (cached as CachedSubscription).isActive && !userEmail) {
         setIsSubscribed(true);
         setLoading(false);
         return;
