@@ -4,6 +4,7 @@ import AddictiveCurves from './AddictiveCurves.js';
 import Alice from './Alice.js';
 import ChaosMic from './ChaosMic.js';
 import RebelRoads from './RebelRoads.js';
+import Blizzard from './Blizzard.js';
 // Import other artists here when you create them
 // import TheWeeknd from './TheWeeknd.js';
 
@@ -11,7 +12,8 @@ const artistSelector = {
   'AddictiveCurves': AddictiveCurves,
   'Alice': Alice,
   'ChaosMic': ChaosMic,
-  'RebelRoads': RebelRoads
+  'RebelRoads': RebelRoads,
+  'Blizzard': Blizzard
   // Add new artists here:
   // 'TheWeeknd': TheWeeknd,
 };
