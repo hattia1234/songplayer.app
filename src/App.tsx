@@ -3,6 +3,7 @@ import { Play, Pause, SkipBack, SkipForward, Search, X, Shuffle, Repeat, Repeat1
 import { Button } from '@/components/ui/button';
 import getArtistData from '@/artists/selector';
 import SubscriptionGuard from '@/SubscriptionGuard'; // for subscriptions
+import ManageSubscriptionButton from '@/subscription-plugin/ui/ManageSubscriptionButton';  
 
 function App() {
     const [artistData, setArtistData] = useState(null);
@@ -414,6 +415,13 @@ function App() {
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
                     </div>
+					
+					{/* Manage Subscription Button - Top Bar */}
+					<div className="hidden md:block w-52">
+						<ManageSubscriptionButton artistKey={artistKey} />
+					</div>
+					
+					
                 </div>
 
                 <div className="flex-1 overflow-auto p-4 lg:p-8 pb-36">

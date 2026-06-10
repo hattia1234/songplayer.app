@@ -7,26 +7,26 @@ interface PaywallProps {
   onSubscribe: () => void;
 }
 
-export default function Paywall({ artistKey, onSubscribe }: PaywallProps) {
+export default function Paywall({ 
+  artistKey, 
+  onSubscribe 
+}: PaywallProps) {
   const [email, setEmail] = useState('');
   const [checking, setChecking] = useState(false);
 
   const handleUnlockWithEmail = async () => {
     if (!email) return;
     setChecking(true);
-
     try {
       const res = await fetch(`/.netlify/functions/subscription-check-subscription?artist=${encodeURIComponent(artistKey)}`, {
         headers: { 'x-user-email': email.trim() }
       });
-
       const data = await res.json();
-
       if (data.isActive === true) {
         localStorage.setItem('subscriptionEmail', email.trim());
-        window.location.reload(); // Unlock
+        window.location.reload();
       } else {
-        alert("No active subscription found for this email and this artist.");
+        alert("No active subscription found for this email.");
       }
     } catch (err) {
       alert("Failed to check subscription.");
@@ -43,16 +43,18 @@ export default function Paywall({ artistKey, onSubscribe }: PaywallProps) {
         </div>
 
         <h1 className="text-4xl font-bold mb-3">Full Access Locked</h1>
-        <p className="text-zinc-400 text-lg">
-          Subscribe for <span className="text-emerald-400 font-semibold">$4.99/month</span>
-        </p>
+        <p className="text-zinc-400 text-lg">Subscribe for <span className="text-emerald-400 font-semibold">$4.99/month</span></p>
 
-        <Button onClick={onSubscribe} className="w-full py-7 text-xl bg-emerald-500 hover:bg-emerald-600 text-black">
+        <Button 
+          onClick={onSubscribe}
+          size="lg"
+          className="w-full py-7 text-xl bg-emerald-500 hover:bg-emerald-600 text-black font-semibold"
+        >
           Subscribe for $4.99 / month
         </Button>
 
         <div className="pt-6 border-t border-zinc-800">
-          <p className="text-sm text-zinc-400 mb-3">Already subscribed? Enter email to unlock</p>
+          <p className="text-sm text-zinc-400 mb-3">Already subscribed on another device?</p>
           <div className="flex gap-2">
             <input
               type="email"

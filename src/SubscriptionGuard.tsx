@@ -11,7 +11,6 @@ interface Props {
 export default function SubscriptionGuard({ artistKey, children }: Props) {
   const [userEmail, setUserEmail] = useState<string | null>(null);
 
-  // Load saved email + handle success redirect
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const successEmail = params.get('email');
@@ -19,13 +18,11 @@ export default function SubscriptionGuard({ artistKey, children }: Props) {
     if (successEmail) {
       localStorage.setItem('subscriptionEmail', successEmail);
       setUserEmail(successEmail);
-      // Clean URL
-      window.history.replaceState({}, '', window.location.pathname + `?artist=${artistKey}`);
     } else {
-      const savedEmail = localStorage.getItem('subscriptionEmail');
-      if (savedEmail) setUserEmail(savedEmail);
+      const saved = localStorage.getItem('subscriptionEmail');
+      if (saved) setUserEmail(saved);
     }
-  }, [artistKey]);
+  }, []);
 
   const { isSubscribed, loading, subscribeToArtist } = useArtistSubscription(artistKey, userEmail || undefined);
 
@@ -34,7 +31,13 @@ export default function SubscriptionGuard({ artistKey, children }: Props) {
   }
 
   if (!isSubscribed && artistKey) {
-    return <Paywall artistKey={artistKey} onSubscribe={subscribeToArtist} />;
+    return (
+      <Paywall 
+        artistKey={artistKey} 
+        onSubscribe={subscribeToArtist} 
+        onManageSubscription={() => window.location.href = '/.netlify/functions/subscription-create-portal'}
+      />
+    );
   }
 
   return <>{children}</>;
