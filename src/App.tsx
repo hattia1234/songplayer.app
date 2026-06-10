@@ -398,32 +398,29 @@ function App() {
 
             {/* MAIN CONTENT */}
             <div className="flex-1 flex flex-col h-full overflow-hidden">
-                <div className="p-4 lg:p-6 border-b border-zinc-800 bg-zinc-900 flex items-center gap-4">
-                    <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setSidebarOpen(true)}>
-                        <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                        </svg>
-                    </Button>
+				<div className="p-4 lg:p-6 border-b border-zinc-800 bg-zinc-900 flex items-center gap-4">
+					<Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setSidebarOpen(true)}>
+						<svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+						</svg>
+					</Button>
 
-                    <div className="relative flex-1 max-w-2xl">
-                        <Search className="absolute left-4 top-3.5 w-5 h-5 text-zinc-400" />
-                        <input
-                            type="text"
-                            placeholder="Search songs..."
-                            className="w-full bg-zinc-800 border border-zinc-700 rounded-2xl py-3 pl-12 text-base focus:outline-none focus:border-emerald-500"
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                        />
-                    </div>
-					
-					{/* Manage Subscription Button - Top Bar */}
-					<div className="hidden md:block w-52">
+					<div className="relative flex-1 max-w-2xl">
+						<Search className="absolute left-4 top-3.5 w-5 h-5 text-zinc-400" />
+						<input
+							type="text"
+							placeholder="Search songs..."
+							className="w-full bg-zinc-800 border border-zinc-700 rounded-2xl py-3 pl-12 text-base focus:outline-none focus:border-emerald-500"
+							value={searchTerm}
+							onChange={(e) => setSearchTerm(e.target.value)}
+						/>
+					</div>
+
+					{/* Manage Subscription Button - Visible on ALL devices including iPhone */}
+					<div className="flex-shrink-0 w-44 sm:w-52">
 						<ManageSubscriptionButton artistKey={artistKey} />
 					</div>
-					
-					
-                </div>
-
+				</div>
                 <div className="flex-1 overflow-auto p-4 lg:p-8 pb-36">
                     <h1 className="text-3xl lg:text-4xl font-bold mb-6">
                         {artistData.artist}
