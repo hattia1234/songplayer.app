@@ -2,6 +2,12 @@
 import { useState, useEffect } from 'react';
 import { getCachedSubscription, cacheSubscription } from '../core/indexeddb-cache';
 
+interface CachedSubscription {
+  isActive: boolean;
+  expiresAt?: string;
+  status?: 'active' | 'cancelled' | 'none';
+}
+
 export function useArtistSubscription(artistKey: string | null, userEmail?: string) {
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -15,7 +21,7 @@ export function useArtistSubscription(artistKey: string | null, userEmail?: stri
     }
 
     const checkSubscription = async () => {
-      const cached = await getCachedSubscription(artistKey);
+      const cached = await getCachedSubscription(artistKey) as CachedSubscription | null;
 
       if (cached && cached.isActive && !userEmail) {
         setIsSubscribed(true);

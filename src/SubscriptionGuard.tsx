@@ -35,7 +35,6 @@ export default function SubscriptionGuard({ artistKey, children }: Props) {
       <Paywall 
         artistKey={artistKey} 
         onSubscribe={subscribeToArtist} 
-        onManageSubscription={() => window.location.href = '/.netlify/functions/subscription-create-portal'}
       />
     );
   }
