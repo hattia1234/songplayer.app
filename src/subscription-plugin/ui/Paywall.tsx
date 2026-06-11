@@ -7,12 +7,23 @@ interface PaywallProps {
   onSubscribe: () => void;
 }
 
+// Easy way to add artist images
+const artistImages: Record<string, string> = {
+  AddictiveCurves: 'https://i.ibb.co/CfbBxmh/Inplainsight.jpg',   // replace with real image
+  Alice: 'https://i.ibb.co/zHTG35Tz/ARTIST-ALICE.jpg',
+  Blizzard: 'https://i.ibb.co/Hf9TYZZX/Solo-Frenzy1.jpg',
+  RebelRoads: 'https://i.ibb.co/n9WqnRB/Rebel-Roads-Artist.jpg',
+  // Add more artists easily here
+};
+
 export default function Paywall({ 
   artistKey, 
   onSubscribe 
 }: PaywallProps) {
   const [email, setEmail] = useState('');
   const [checking, setChecking] = useState(false);
+
+  const artistImage = artistImages[artistKey] || 'https://via.placeholder.com/300x300/27272a/white?text=Artist';
 
   const handleUnlockWithEmail = async () => {
     if (!email) return;
@@ -38,11 +49,17 @@ export default function Paywall({
   return (
     <div className="min-h-screen bg-zinc-950 text-white flex items-center justify-center p-6">
       <div className="max-w-md w-full text-center space-y-8">
-        <div className="mx-auto w-28 h-28 bg-zinc-800 rounded-3xl flex items-center justify-center text-6xl mb-4">
-          🔒
+        
+        {/* Artist Image */}
+        <div className="mx-auto w-48 h-48 rounded-2xl overflow-hidden border-4 border-zinc-800 shadow-2xl">
+          <img 
+            src={artistImage} 
+            alt={artistKey}
+            className="w-full h-full object-cover"
+          />
         </div>
 
-        <h1 className="text-4xl font-bold mb-3">Full Access Locked</h1>
+        <h1 className="text-4xl font-bold mb-3">{artistKey} - Full Access Locked</h1>
         <p className="text-zinc-400 text-lg">Subscribe for <span className="text-emerald-400 font-semibold">$4.99/month</span></p>
 
         <Button 
