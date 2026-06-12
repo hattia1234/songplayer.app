@@ -5,6 +5,7 @@ import Alice from './Alice.js';
 import ChaosMic from './ChaosMic.js';
 import RebelRoads from './RebelRoads.js';
 import Blizzard from './Blizzard.js';
+import Virtuosity from './Virtuosity.js';
 // Import other artists here when you create them
 // import TheWeeknd from './TheWeeknd.js';
 
@@ -13,7 +14,8 @@ const artistSelector = {
   'Alice': Alice,
   'ChaosMic': ChaosMic,
   'RebelRoads': RebelRoads,
-  'Blizzard': Blizzard
+  'Blizzard': Blizzard,
+  'Virtuosity': Virtuosity  
   // Add new artists here:
   // 'TheWeeknd': TheWeeknd,
 };
