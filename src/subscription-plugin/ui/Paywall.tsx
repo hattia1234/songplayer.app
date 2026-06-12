@@ -13,6 +13,7 @@ const artistImages: Record<string, string> = {
   Alice: 'https://i.ibb.co/zHTG35Tz/ARTIST-ALICE.jpg',
   Blizzard: 'https://i.ibb.co/Hf9TYZZX/Solo-Frenzy1.jpg',
   RebelRoads: 'https://i.ibb.co/n9WqnRB/Rebel-Roads-Artist.jpg',
+  Virtuosity: 'https://i.ibb.co/dJpP15y9/Virtuosity-Artist.jpg',
   // Add more artists easily here
 };
 
